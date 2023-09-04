@@ -73,7 +73,6 @@ fun main() {
 			val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
 			HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
 			HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
-			HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
@@ -97,6 +96,8 @@ fun main() {
 					squareRect.bottom += 10
 				}
 			}
+
+			HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 		}
 	}
 }
