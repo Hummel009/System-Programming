@@ -5,7 +5,9 @@ import com.sun.jna.platform.win32.WinUser.*
 import java.awt.Color
 import java.awt.Toolkit
 import java.awt.event.KeyEvent
+import kotlin.experimental.and
 
+val WM_MOUSEWHEEL = 0x020A
 
 fun main() {
 	val className = "RenderingRectangle"
@@ -67,13 +69,8 @@ fun main() {
 	while (HNUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		HNUser32.INSTANCE.TranslateMessage(msg)
 		HNUser32.INSTANCE.DispatchMessage(msg)
-
 		if (msg.message == WM_KEYDOWN) {
-			val hdc = HNUser32.INSTANCE.GetDC(hwnd)
-			val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
-			HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
-			HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
-
+			clearAndUpdate(hwnd, squareRect)
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
@@ -96,10 +93,39 @@ fun main() {
 					squareRect.bottom += 10
 				}
 			}
+		}
 
-			HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
+		if (msg.message == WM_MOUSEWHEEL) {
+			clearAndUpdate(hwnd, squareRect)
+			val wheelDelta = (msg.wParam.toInt() shr 16)
+			val isShiftPressed = (HNUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
+			if (isShiftPressed) {
+				if (wheelDelta > 0) {
+					squareRect.left -= 10
+					squareRect.right -= 10
+				} else {
+					squareRect.left += 10
+					squareRect.right += 10
+				}
+			} else {
+				if (wheelDelta > 0) {
+					squareRect.top -= 10
+					squareRect.bottom -= 10
+				} else {
+					squareRect.top += 10
+					squareRect.bottom += 10
+				}
+			}
 		}
 	}
+}
+
+private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT) {
+	val hdc = HNUser32.INSTANCE.GetDC(hwnd)
+	val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
+	HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
+	HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
+	HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 }
 
 private fun Color.toDword(): DWORD {

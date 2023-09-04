@@ -32,6 +32,7 @@ internal interface HNUser32 : User32 {
 	fun BeginPaint(hWnd: HWND?, lpPaint: PAINTSTRUCT?): HDC?
 	fun EndPaint(hWnd: HWND?, lpPaint: PAINTSTRUCT?): Boolean
 	fun FillRect(hDC: HDC?, lprc: RECT?, hbr: HBRUSH?): Int
+	fun GetKeyState(nVirtKey: Int): Short
 
 	companion object {
 		val INSTANCE: HNUser32 = Native.load("user32", HNUser32::class.java, W32APIOptions.DEFAULT_OPTIONS)
