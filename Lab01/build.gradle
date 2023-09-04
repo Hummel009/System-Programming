@@ -21,8 +21,10 @@ configurations {
 
 dependencies {
 	embed 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
-    embed 'net.java.dev.jna:jna:5.9.0'
-    implementation 'net.java.dev.jna:jna:5.9.0'
+	embed 'net.java.dev.jna:jna:5.13.0'
+	embed 'net.java.dev.jna:jna-platform:5.13.0'
+	implementation 'net.java.dev.jna:jna:5.13.0'
+	implementation 'net.java.dev.jna:jna-platform:5.13.0'
 }
 
 kotlin {
