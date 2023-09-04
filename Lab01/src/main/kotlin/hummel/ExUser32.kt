@@ -7,6 +7,9 @@ import com.sun.jna.platform.win32.WinDef.*
 import com.sun.jna.win32.W32APIOptions
 
 internal interface ExUser32 : User32 {
+	companion object {
+		val INSTANCE: ExUser32 = Native.load("user32", ExUser32::class.java, W32APIOptions.DEFAULT_OPTIONS)
+	}
 
 	@Structure.FieldOrder("hdc", "fErase", "rcPaint", "fRestore", "fIncUpdate", "rgbReserved")
 	open class PAINTSTRUCT : Structure() {
@@ -33,8 +36,4 @@ internal interface ExUser32 : User32 {
 	fun EndPaint(hWnd: HWND?, lpPaint: PAINTSTRUCT?): Boolean
 	fun FillRect(hDC: HDC?, lprc: RECT?, hbr: HBRUSH?): Int
 	fun GetKeyState(nVirtKey: Int): Short
-
-	companion object {
-		val INSTANCE: ExUser32 = Native.load("user32", ExUser32::class.java, W32APIOptions.DEFAULT_OPTIONS)
-	}
 }
