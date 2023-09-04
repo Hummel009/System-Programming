@@ -1,9 +1,11 @@
 package hummel
 
 import com.sun.jna.Native
+import com.sun.jna.platform.win32.GDI32
 import com.sun.jna.platform.win32.User32
 import com.sun.jna.platform.win32.WinDef
 import com.sun.jna.platform.win32.WinUser
+import java.awt.event.KeyEvent
 
 class SpriteWindow {
 	private val user32 = Native.load("user32", User32::class.java)
@@ -16,7 +18,7 @@ class SpriteWindow {
 	private val spriteWidth = 50
 	private val spriteHeight = 50
 
-	private val spriteColor = WinUser.COLORREF(0xFF0000) // Red color
+	private val spriteColor = 0xFF0000
 
 	private var spriteX = 0
 	private var spriteY = 0
@@ -29,32 +31,44 @@ class SpriteWindow {
 		// Регистрируем класс окна
 		val wndClass = WinUser.WNDCLASSEX()
 		wndClass.lpfnWndProc = WinUser.WindowProc { hwnd, uMsg, wParam, lParam ->
-			when (uMsg.toInt()) {
+			when (uMsg) {
 				WinUser.WM_PAINT -> {
 					drawSprite(hwnd)
+					user32.DefWindowProc(hwnd, uMsg, wParam, lParam)
 				}
 
 				WinUser.WM_CLOSE -> {
 					user32.PostQuitMessage(0)
+					WinDef.LRESULT(0)
 				}
 
 				WinUser.WM_KEYDOWN -> {
 					handleKeyPress(wParam.toInt())
+					WinDef.LRESULT(0)
 				}
 
-				WinUser.WM_MOUSEWHEEL -> {
+				0x020A /* WM_MOUSEWHEEL */ -> {
 					handleMouseWheel(wParam, lParam)
+					WinDef.LRESULT(0)
 				}
 
 				else -> {
-					return@WindowProc user32.DefWindowProc(hwnd, uMsg, wParam, lParam)
+					user32.DefWindowProc(hwnd, uMsg, wParam, lParam)
 				}
 			}
-			0
 		}
 		wndClass.hInstance = null
 		wndClass.lpszClassName = windowClassName
 		user32.RegisterClassEx(wndClass)
+
+		// Получаем размер экрана
+		val screen = User32.INSTANCE.GetDesktopWindow()
+		val screenRect = WinDef.RECT()
+		User32.INSTANCE.GetWindowRect(screen, screenRect)
+
+		// Центрируем окно на экране
+		val windowX = (screenRect.right - screenRect.left - windowWidth) / 2
+		val windowY = (screenRect.bottom - screenRect.top - windowHeight) / 2
 
 		// Создаем окно
 		val hwnd = user32.CreateWindowEx(
@@ -62,8 +76,8 @@ class SpriteWindow {
 			windowClassName,
 			windowTitle,
 			WinUser.WS_OVERLAPPEDWINDOW or WinUser.WS_VISIBLE,
-			WinDef.CW_USEDEFAULT,
-			WinDef.CW_USEDEFAULT,
+			windowX,
+			windowY,
 			windowWidth,
 			windowHeight,
 			null,
@@ -111,38 +125,44 @@ class SpriteWindow {
 		spriteRect.right = spriteX + spriteWidth
 		spriteRect.bottom = spriteY + spriteHeight
 
-		user32.FillRect(hdc, spriteRect, spriteColor)
 		user32.ReleaseDC(hwnd, hdc)
 	}
 
 	private fun handleKeyPress(keyCode: Int) {
 		when (keyCode) {
-			WinUser.VK_ESCAPE -> user32.PostQuitMessage(0)
-			WinUser.VK_LEFT -> spriteXVelocity = -5
-			WinUser.VK_RIGHT -> spriteXVelocity = 5
-			WinUser.VK_UP -> spriteYVelocity = -5
-			WinUser.VK_DOWN -> spriteYVelocity = 5
+			KeyEvent.VK_ESCAPE -> user32.PostQuitMessage(0)
+			KeyEvent.VK_LEFT -> spriteXVelocity = -5
+			KeyEvent.VK_RIGHT -> spriteXVelocity = 5
+			KeyEvent.VK_UP -> spriteYVelocity = -5
+			KeyEvent.VK_DOWN -> spriteYVelocity = 5
 		}
 	}
 
 	private fun handleMouseWheel(wParam: WinDef.WPARAM, lParam: WinDef.LPARAM) {
-		val wheelDelta = wParam.toInt()
-		if (WinUser.HIWORD(wheelDelta) and WinUser.MK_SHIFT != 0) {
+		val wheelDelta = wParam.toLong()
+
+		val highWord = (wheelDelta shr 16).toInt() // Extract the high word
+		val lowWord = (wheelDelta and 0xFFFF).toInt() // Extract the low word
+
+		val isCtrlPressed = KeyEvent.getKeyModifiersText(KeyEvent.CTRL_DOWN_MASK) != "Ctrl"
+		val isShiftPressed = KeyEvent.getKeyModifiersText(KeyEvent.SHIFT_DOWN_MASK) != "Shift"
+
+		if (isShiftPressed) {
 			// Shift key is pressed, scroll horizontally
-			spriteXVelocity = if (WinUser.HIWORD(wheelDelta) and WinUser.MK_CONTROL != 0) {
+			spriteXVelocity = if (isCtrlPressed) {
 				// Ctrl key is also pressed, scroll faster horizontally
-				if (WinUser.LOWORD(wheelDelta) > 0) 10 else -10
+				if (lowWord > 0) 10 else -10
 			} else {
-				if (WinUser.LOWORD(wheelDelta) > 0) 5 else -5
+				if (lowWord > 0) 5 else -5
 			}
 			isMovingHorizontally = true
 		} else {
 			// Scroll vertically
-			spriteYVelocity = if (WinUser.HIWORD(wheelDelta) and WinUser.MK_CONTROL != 0) {
+			spriteYVelocity = if (isCtrlPressed) {
 				// Ctrl key is pressed, scroll faster vertically
-				if (WinUser.LOWORD(wheelDelta) > 0) 10 else -10
+				if (lowWord > 0) 10 else -10
 			} else {
-				if (WinUser.LOWORD(wheelDelta) > 0) 5 else -5
+				if (lowWord > 0) 5 else -5
 			}
 			isMovingHorizontally = false
 		}
