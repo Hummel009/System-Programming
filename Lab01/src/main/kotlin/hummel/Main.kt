@@ -7,7 +7,7 @@ import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import kotlin.experimental.and
 
-val WM_MOUSEWHEEL = 0x020A
+const val WM_MOUSEWHEEL: Int = 0x020A
 
 fun main() {
 	val className = "RenderingRectangle"
