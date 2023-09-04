@@ -13,6 +13,12 @@ fun main() {
 	val className = "ClassHummel009"
 	val windowTitle = "Kotlin JNA WINAPI Test"
 
+	val squareRect = WinDef.RECT()
+	squareRect.left = 10
+	squareRect.top = 10
+	squareRect.right = 30
+	squareRect.bottom = 30
+
 	val windowClass = WinUser.WNDCLASSEX()
 	windowClass.hInstance = null
 	windowClass.lpfnWndProc = WinUser.WindowProc { hwnd, uMsg, wParam, lParam ->
@@ -32,12 +38,6 @@ fun main() {
 				val redBrush =
 					HNGdi32.INSTANCE.CreateSolidBrush(fromRGB(Color.RED.red, Color.RED.green, Color.RED.blue))
 
-				val squareRect = WinDef.RECT()
-				squareRect.left = 10
-				squareRect.top = 10
-				squareRect.right = 30
-				squareRect.bottom = 30
-
 				HNUser32.INSTANCE.FillRect(hdc, squareRect, redBrush)
 				HNUser32.INSTANCE.EndPaint(hwnd, ps)
 				WinDef.LRESULT(0)
@@ -46,10 +46,29 @@ fun main() {
 			WinUser.WM_KEYDOWN -> {
 				val keyCode = wParam.toInt()
 				when (keyCode) {
-					KeyEvent.VK_LEFT -> moveRectangle(hwnd, -10, 0)
-					KeyEvent.VK_RIGHT -> moveRectangle(hwnd, 10, 0)
-					KeyEvent.VK_UP -> moveRectangle(hwnd, 0, -10)
-					KeyEvent.VK_DOWN -> moveRectangle(hwnd, 0, 10)
+					KeyEvent.VK_LEFT -> {
+						squareRect.left -= 10
+						squareRect.right -= 10
+						User32.INSTANCE.InvalidateRect(hwnd, squareRect, true)
+					}
+
+					KeyEvent.VK_RIGHT -> {
+						squareRect.left += 10
+						squareRect.right += 10
+						User32.INSTANCE.InvalidateRect(hwnd, squareRect, true)
+					}
+
+					KeyEvent.VK_UP -> {
+						squareRect.top -= 10
+						squareRect.bottom -= 10
+						User32.INSTANCE.InvalidateRect(hwnd, squareRect, true)
+					}
+
+					KeyEvent.VK_DOWN -> {
+						squareRect.top += 10
+						squareRect.bottom += 10
+						User32.INSTANCE.InvalidateRect(hwnd, squareRect, true)
+					}
 				}
 				WinDef.LRESULT(0)
 			}
@@ -82,19 +101,6 @@ fun main() {
 		User32.INSTANCE.TranslateMessage(msg)
 		User32.INSTANCE.DispatchMessage(msg)
 	}
-}
-
-fun moveRectangle(hwnd: WinDef.HWND, dx: Int, dy: Int) {
-	val rect = WinDef.RECT()
-	User32.INSTANCE.GetClientRect(hwnd, rect)
-	User32.INSTANCE.InvalidateRect(hwnd, rect, true)
-	User32.INSTANCE.UpdateWindow(hwnd)
-
-	User32.INSTANCE.GetWindowRect(hwnd, rect)
-	User32.INSTANCE.MoveWindow(
-		hwnd, rect.left + dx, rect.top + dy,
-		rect.right - rect.left, rect.bottom - rect.top, true
-	)
 }
 
 fun fromRGB(red: Int, green: Int, blue: Int): DWORD {
