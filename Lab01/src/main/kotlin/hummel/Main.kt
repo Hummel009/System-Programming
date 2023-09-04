@@ -13,7 +13,7 @@ fun main() {
 	val className = "RenderingRectangle"
 	val windowTitle = "Kotlin JNA WINAPI Test"
 
-	val ps = HNUser32.PAINTSTRUCT()
+	val ps = ExUser32.PAINTSTRUCT()
 	val squareRect = RECT()
 	squareRect.left = 10
 	squareRect.top = 10
@@ -25,7 +25,7 @@ fun main() {
 	windowClass.lpfnWndProc = WindowProc { hwnd, uMsg, wParam, lParam ->
 		when (uMsg) {
 			WM_DESTROY -> {
-				HNUser32.INSTANCE.PostQuitMessage(0)
+				ExUser32.INSTANCE.PostQuitMessage(0)
 				LRESULT(0)
 			}
 
@@ -34,21 +34,21 @@ fun main() {
 			}
 
 			WM_PAINT -> {
-				val hdc = HNUser32.INSTANCE.BeginPaint(hwnd, ps)
-				val redBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
+				val hdc = ExUser32.INSTANCE.BeginPaint(hwnd, ps)
+				val redBrush = ExGDI32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
 
-				HNUser32.INSTANCE.FillRect(hdc, squareRect, redBrush)
-				HNUser32.INSTANCE.EndPaint(hwnd, ps)
+				ExUser32.INSTANCE.FillRect(hdc, squareRect, redBrush)
+				ExUser32.INSTANCE.EndPaint(hwnd, ps)
 				LRESULT(0)
 			}
 
-			else -> HNUser32.INSTANCE.DefWindowProc(hwnd, uMsg, wParam, lParam)
+			else -> ExUser32.INSTANCE.DefWindowProc(hwnd, uMsg, wParam, lParam)
 		}
 	}
 	windowClass.lpszClassName = className
 	windowClass.cbSize = windowClass.size()
 
-	HNUser32.INSTANCE.RegisterClassEx(windowClass)
+	ExUser32.INSTANCE.RegisterClassEx(windowClass)
 
 	val screenSize = Toolkit.getDefaultToolkit().screenSize
 	val screenWidth = screenSize.getWidth().toInt()
@@ -58,17 +58,17 @@ fun main() {
 	val x = (screenWidth - windowWidth) / 2
 	val y = (screenHeight - windowHeight) / 2
 
-	val hwnd = HNUser32.INSTANCE.CreateWindowEx(
+	val hwnd = ExUser32.INSTANCE.CreateWindowEx(
 		0, className, windowTitle, WS_OVERLAPPEDWINDOW, x, y, windowWidth, windowHeight, null, null, null, null
 	)
 
-	HNUser32.INSTANCE.ShowWindow(hwnd, SW_SHOW)
-	HNUser32.INSTANCE.UpdateWindow(hwnd)
+	ExUser32.INSTANCE.ShowWindow(hwnd, SW_SHOW)
+	ExUser32.INSTANCE.UpdateWindow(hwnd)
 
 	val msg = MSG()
-	while (HNUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
-		HNUser32.INSTANCE.TranslateMessage(msg)
-		HNUser32.INSTANCE.DispatchMessage(msg)
+	while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
+		ExUser32.INSTANCE.TranslateMessage(msg)
+		ExUser32.INSTANCE.DispatchMessage(msg)
 
 		var moved = false
 
@@ -105,7 +105,7 @@ fun main() {
 		if (msg.message == WM_MOUSEWHEEL) {
 			clearAndUpdate(hwnd, squareRect)
 			val wheelDelta = (msg.wParam.toInt() shr 16)
-			val isShiftPressed = (HNUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
+			val isShiftPressed = (ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
 			if (isShiftPressed) {
 				if (wheelDelta > 0) {
 					squareRect.left -= 10
@@ -148,11 +148,11 @@ fun main() {
 }
 
 private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT) {
-	val hdc = HNUser32.INSTANCE.GetDC(hwnd)
-	val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
-	HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
-	HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
-	HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
+	val hdc = ExUser32.INSTANCE.GetDC(hwnd)
+	val whiteBrush = ExGDI32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
+	ExUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
+	ExUser32.INSTANCE.ReleaseDC(hwnd, hdc)
+	ExUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 }
 
 private fun Color.toDword(): DWORD {
