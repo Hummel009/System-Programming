@@ -44,28 +44,12 @@ fun main() {
 			}
 
 			WinUser.WM_KEYDOWN -> {
-				val keyCode = wParam.toInt()
-				when (keyCode) {
-					KeyEvent.VK_LEFT -> {
-						squareRect.left -= 10
-						squareRect.right -= 10
-					}
+				// Clear the window by filling it with a background color (e.g., white)
+				val hdc = User32.INSTANCE.GetDC(hwnd)
+				val whiteColor = HNGdi32.INSTANCE.GetStockObject(HNGdi32.WHITE_BRUSH)
+				HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteColor)
+				User32.INSTANCE.ReleaseDC(hwnd, hdc)
 
-					KeyEvent.VK_RIGHT -> {
-						squareRect.left += 10
-						squareRect.right += 10
-					}
-
-					KeyEvent.VK_UP -> {
-						squareRect.top -= 10
-						squareRect.bottom -= 10
-					}
-
-					KeyEvent.VK_DOWN -> {
-						squareRect.top += 10
-						squareRect.bottom += 10
-					}
-				}
 				User32.INSTANCE.InvalidateRect(hwnd, null, true)
 				WinDef.LRESULT(0)
 			}
@@ -97,12 +81,6 @@ fun main() {
 	while (User32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		User32.INSTANCE.TranslateMessage(msg)
 		User32.INSTANCE.DispatchMessage(msg)
-
-		// Clear the window by filling it with a background color (e.g., white)
-		val hdc = User32.INSTANCE.GetDC(hwnd)
-		val whiteColor = HNGdi32.INSTANCE.GetStockObject(HNGdi32.WHITE_BRUSH)
-		HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteColor)
-		User32.INSTANCE.ReleaseDC(hwnd, hdc)
 
 		// Add this part to invalidate the entire window for repaint
 		if (msg.message == WinUser.WM_KEYDOWN) {
