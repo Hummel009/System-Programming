@@ -40,18 +40,6 @@ fun main() {
 				LRESULT(0)
 			}
 
-			WM_KEYDOWN -> {
-				//clear tail
-				val hdc = HNUser32.INSTANCE.GetDC(hwnd)
-				val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
-				HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
-				HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
-
-				//move rectangle
-				HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
-				LRESULT(0)
-			}
-
 			else -> HNUser32.INSTANCE.DefWindowProc(hwnd, uMsg, wParam, lParam)
 		}
 	}
@@ -81,6 +69,12 @@ fun main() {
 		HNUser32.INSTANCE.DispatchMessage(msg)
 
 		if (msg.message == WM_KEYDOWN) {
+			val hdc = HNUser32.INSTANCE.GetDC(hwnd)
+			val whiteBrush = HNGdi32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
+			HNUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
+			HNUser32.INSTANCE.ReleaseDC(hwnd, hdc)
+			HNUser32.INSTANCE.InvalidateRect(hwnd, null, true)
+
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
