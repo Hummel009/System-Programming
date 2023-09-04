@@ -69,6 +69,9 @@ fun main() {
 	while (HNUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		HNUser32.INSTANCE.TranslateMessage(msg)
 		HNUser32.INSTANCE.DispatchMessage(msg)
+
+		var moved = false
+
 		if (msg.message == WM_KEYDOWN) {
 			clearAndUpdate(hwnd, squareRect)
 			val keyCode = msg.wParam.toInt()
@@ -76,21 +79,25 @@ fun main() {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
 					squareRect.left -= 10
 					squareRect.right -= 10
+					moved = true
 				}
 
 				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
 					squareRect.left += 10
 					squareRect.right += 10
+					moved = true
 				}
 
 				KeyEvent.VK_UP, KeyEvent.VK_W -> {
 					squareRect.top -= 10
 					squareRect.bottom -= 10
+					moved = true
 				}
 
 				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
 					squareRect.top += 10
 					squareRect.bottom += 10
+					moved = true
 				}
 			}
 		}
@@ -115,6 +122,26 @@ fun main() {
 					squareRect.top += 10
 					squareRect.bottom += 10
 				}
+			}
+			moved = true
+		}
+
+		if (moved) {
+			if (squareRect.left < 0) {
+				squareRect.right -= squareRect.left
+				squareRect.left = 0
+			}
+			if (squareRect.right > (windowWidth - 18)) {
+				squareRect.left -= squareRect.right - (windowWidth - 18)
+				squareRect.right = (windowWidth - 18)
+			}
+			if (squareRect.top < 0) {
+				squareRect.bottom -= squareRect.top
+				squareRect.top = 0
+			}
+			if (squareRect.bottom > (windowHeight - 47)) {
+				squareRect.top -= squareRect.bottom - (windowHeight - 47)
+				squareRect.bottom = (windowHeight - 47)
 			}
 		}
 	}
