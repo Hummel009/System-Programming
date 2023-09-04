@@ -36,7 +36,7 @@ fun main() {
 			WinUser.WM_PAINT -> {
 				val hdc = HNUser32.INSTANCE.BeginPaint(hwnd, ps)
 				val redBrush =
-					HNGdi32.INSTANCE.CreateSolidBrush(fromRGB(Color.RED.red, Color.RED.green, Color.RED.blue))
+					HNGdi32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
 
 				HNUser32.INSTANCE.FillRect(hdc, squareRect, redBrush)
 				HNUser32.INSTANCE.EndPaint(hwnd, ps)
@@ -106,11 +106,10 @@ fun main() {
 					squareRect.bottom += 10
 				}
 			}
-			User32.INSTANCE.InvalidateRect(hwnd, null, true)
 		}
 	}
 }
 
-fun fromRGB(red: Int, green: Int, blue: Int): DWORD {
+private fun Color.toDword(): DWORD {
 	return DWORD((blue shl 16 or (green shl 8) or red).toLong())
 }
