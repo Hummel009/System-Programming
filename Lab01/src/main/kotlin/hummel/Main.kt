@@ -66,37 +66,40 @@ fun main() {
 	ExUser32.INSTANCE.UpdateWindow(hwnd)
 
 	val msg = MSG()
+	var speedL = 10
+	var speedR = 10
+	var speedT = 10
+	var speedB = 10
 	while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
 
 		var moved = false
-
 		if (msg.message == WM_KEYDOWN) {
 			clearAndUpdate(hwnd, squareRect)
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
-					squareRect.left -= 10
-					squareRect.right -= 10
+					squareRect.left -= speedL
+					squareRect.right -= speedR
 					moved = true
 				}
 
 				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
-					squareRect.left += 10
-					squareRect.right += 10
+					squareRect.left += speedL
+					squareRect.right += speedR
 					moved = true
 				}
 
 				KeyEvent.VK_UP, KeyEvent.VK_W -> {
-					squareRect.top -= 10
-					squareRect.bottom -= 10
+					squareRect.top -= speedT
+					squareRect.bottom -= speedB
 					moved = true
 				}
 
 				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
-					squareRect.top += 10
-					squareRect.bottom += 10
+					squareRect.top += speedT
+					squareRect.bottom += speedB
 					moved = true
 				}
 			}
@@ -108,19 +111,19 @@ fun main() {
 			val isShiftPressed = (ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
 			if (isShiftPressed) {
 				if (wheelDelta > 0) {
-					squareRect.left -= 10
-					squareRect.right -= 10
+					squareRect.left -= speedL
+					squareRect.right -= speedR
 				} else {
-					squareRect.left += 10
-					squareRect.right += 10
+					squareRect.left += speedL
+					squareRect.right += speedR
 				}
 			} else {
 				if (wheelDelta > 0) {
-					squareRect.top -= 10
-					squareRect.bottom -= 10
+					squareRect.top -= speedT
+					squareRect.bottom -= speedB
 				} else {
-					squareRect.top += 10
-					squareRect.bottom += 10
+					squareRect.top += speedT
+					squareRect.bottom += speedB
 				}
 			}
 			moved = true
@@ -130,18 +133,26 @@ fun main() {
 			if (squareRect.left < 0) {
 				squareRect.right -= squareRect.left
 				squareRect.left = 0
+				speedL *= -1
+				speedR *= -1
 			}
 			if (squareRect.right > (windowWidth - 18)) {
 				squareRect.left -= squareRect.right - (windowWidth - 18)
 				squareRect.right = (windowWidth - 18)
+				speedL *= -1
+				speedR *= -1
 			}
 			if (squareRect.top < 0) {
 				squareRect.bottom -= squareRect.top
 				squareRect.top = 0
+				speedT *= -1
+				speedB *= -1
 			}
 			if (squareRect.bottom > (windowHeight - 47)) {
 				squareRect.top -= squareRect.bottom - (windowHeight - 47)
 				squareRect.bottom = (windowHeight - 47)
+				speedT *= -1
+				speedB *= -1
 			}
 		}
 	}
