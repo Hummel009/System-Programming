@@ -70,10 +70,14 @@ fun main() {
 	var speedR = 10
 	var speedT = 10
 	var speedB = 10
+	var reverseX = false
+	var reverseY = false
+	var iter = 0
 	while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
 
+		val reverse = reverseX || reverseY
 		var moved = false
 		if (msg.message == WM_KEYDOWN) {
 			clearAndUpdate(hwnd, squareRect)
@@ -83,24 +87,36 @@ fun main() {
 					squareRect.left -= speedL
 					squareRect.right -= speedR
 					moved = true
+					if (reverse) {
+						iter++
+					}
 				}
 
 				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
 					squareRect.left += speedL
 					squareRect.right += speedR
 					moved = true
+					if (reverse) {
+						iter++
+					}
 				}
 
 				KeyEvent.VK_UP, KeyEvent.VK_W -> {
 					squareRect.top -= speedT
 					squareRect.bottom -= speedB
 					moved = true
+					if (reverse) {
+						iter++
+					}
 				}
 
 				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
 					squareRect.top += speedT
 					squareRect.bottom += speedB
 					moved = true
+					if (reverse) {
+						iter++
+					}
 				}
 			}
 		}
@@ -135,24 +151,42 @@ fun main() {
 				squareRect.left = 0
 				speedL *= -1
 				speedR *= -1
+				reverseX = true
 			}
 			if (squareRect.right > (windowWidth - 18)) {
 				squareRect.left -= squareRect.right - (windowWidth - 18)
 				squareRect.right = (windowWidth - 18)
 				speedL *= -1
 				speedR *= -1
+				reverseX = true
 			}
 			if (squareRect.top < 0) {
 				squareRect.bottom -= squareRect.top
 				squareRect.top = 0
 				speedT *= -1
 				speedB *= -1
+				reverseY = true
 			}
 			if (squareRect.bottom > (windowHeight - 47)) {
 				squareRect.top -= squareRect.bottom - (windowHeight - 47)
 				squareRect.bottom = (windowHeight - 47)
 				speedT *= -1
 				speedB *= -1
+				reverseY = true
+			}
+		}
+		if (reverse && iter == 5) {
+			if (reverseX) {
+				speedL *= -1
+				speedR *= -1
+				reverseX = false
+				iter = 0
+			}
+			if (reverseY) {
+				speedT *= -1
+				speedB *= -1
+				reverseY = false
+				iter = 0
 			}
 		}
 	}
