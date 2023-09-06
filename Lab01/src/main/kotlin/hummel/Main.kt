@@ -73,17 +73,15 @@ fun main() {
 	}
 
 	val msg = MSG()
-	var speedL = 10
-	var speedR = 10
-	var speedT = 10
-	var speedB = 10
+	var speedX = 10
+	var speedY = 10
 	var reverseX = false
 	var reverseY = false
-	var iter = 0
-	var snakeMode = false
-	var isMousePressed = false
 	var mouseX = 0
 	var mouseY = 0
+	var iter = 0
+	var isSnakeMode = false
+	var isMousePressed = false
 	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
@@ -91,12 +89,12 @@ fun main() {
 		val reverse = reverseX || reverseY
 		var moved = false
 		if (msg.message == WM_KEYDOWN) {
-			clearAndUpdate(hwnd, squareRect, snakeMode)
+			clearAndUpdate(hwnd, squareRect, isSnakeMode)
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
-					squareRect.left -= speedL
-					squareRect.right -= speedR
+					squareRect.left -= speedX
+					squareRect.right -= speedX
 					moved = true
 					if (reverse) {
 						iter++
@@ -104,8 +102,8 @@ fun main() {
 				}
 
 				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
-					squareRect.left += speedL
-					squareRect.right += speedR
+					squareRect.left += speedX
+					squareRect.right += speedX
 					moved = true
 					if (reverse) {
 						iter++
@@ -113,8 +111,8 @@ fun main() {
 				}
 
 				KeyEvent.VK_UP, KeyEvent.VK_W -> {
-					squareRect.top -= speedT
-					squareRect.bottom -= speedB
+					squareRect.top -= speedY
+					squareRect.bottom -= speedY
 					moved = true
 					if (reverse) {
 						iter++
@@ -122,8 +120,8 @@ fun main() {
 				}
 
 				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
-					squareRect.top += speedT
-					squareRect.bottom += speedB
+					squareRect.top += speedY
+					squareRect.bottom += speedY
 					moved = true
 					if (reverse) {
 						iter++
@@ -134,7 +132,7 @@ fun main() {
 
 		if (msg.message == WM_HOTKEY) {
 			if (msg.wParam.toInt() == HotKeys.X.ordinal) {
-				snakeMode = true
+				isSnakeMode = true
 			}
 			if (msg.wParam.toInt() == HotKeys.Z.ordinal) {
 				break@loop
@@ -154,44 +152,44 @@ fun main() {
 		}
 
 		if (isMousePressed) {
-			clearAndUpdate(hwnd, squareRect, snakeMode)
+			clearAndUpdate(hwnd, squareRect, isSnakeMode)
 			if (mouseX > squareRect.left) {
-				squareRect.left += speedL
-				squareRect.right += speedR
-			}
-			if (mouseY > squareRect.bottom) {
-				squareRect.bottom += speedB
-				squareRect.top += speedT
+				squareRect.left += speedX
+				squareRect.right += speedX
 			}
 			if (mouseX < squareRect.left) {
-				squareRect.left -= speedL
-				squareRect.right -= speedR
+				squareRect.left -= speedX
+				squareRect.right -= speedX
+			}
+			if (mouseY > squareRect.bottom) {
+				squareRect.bottom += speedY
+				squareRect.top += speedY
 			}
 			if (mouseY < squareRect.bottom) {
-				squareRect.bottom -= speedB
-				squareRect.top -= speedT
+				squareRect.bottom -= speedY
+				squareRect.top -= speedY
 			}
 		}
 
 		if (msg.message == WM_MOUSEWHEEL) {
-			clearAndUpdate(hwnd, squareRect, snakeMode)
+			clearAndUpdate(hwnd, squareRect, isSnakeMode)
 			val wheelDelta = (msg.wParam.toInt() shr 16)
 			val isShiftPressed = (ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
 			if (isShiftPressed) {
 				if (wheelDelta > 0) {
-					squareRect.left -= speedL
-					squareRect.right -= speedR
+					squareRect.left -= speedX
+					squareRect.right -= speedX
 				} else {
-					squareRect.left += speedL
-					squareRect.right += speedR
+					squareRect.left += speedX
+					squareRect.right += speedX
 				}
 			} else {
 				if (wheelDelta > 0) {
-					squareRect.top -= speedT
-					squareRect.bottom -= speedB
+					squareRect.top -= speedY
+					squareRect.bottom -= speedY
 				} else {
-					squareRect.top += speedT
-					squareRect.bottom += speedB
+					squareRect.top += speedY
+					squareRect.bottom += speedY
 				}
 			}
 			moved = true
@@ -201,42 +199,42 @@ fun main() {
 			if (squareRect.left < 0) {
 				squareRect.right -= squareRect.left
 				squareRect.left = 0
-				speedL *= -1
-				speedR *= -1
+				speedX *= -1
+				speedX *= -1
 				reverseX = true
 			}
 			if (squareRect.right > (windowWidth - 18)) {
 				squareRect.left -= squareRect.right - (windowWidth - 18)
 				squareRect.right = (windowWidth - 18)
-				speedL *= -1
-				speedR *= -1
+				speedX *= -1
+				speedX *= -1
 				reverseX = true
 			}
 			if (squareRect.top < 0) {
 				squareRect.bottom -= squareRect.top
 				squareRect.top = 0
-				speedT *= -1
-				speedB *= -1
+				speedY *= -1
+				speedY *= -1
 				reverseY = true
 			}
 			if (squareRect.bottom > (windowHeight - 47)) {
 				squareRect.top -= squareRect.bottom - (windowHeight - 47)
 				squareRect.bottom = (windowHeight - 47)
-				speedT *= -1
-				speedB *= -1
+				speedY *= -1
+				speedY *= -1
 				reverseY = true
 			}
 		}
 		if (reverse && iter == 5) {
 			if (reverseX) {
-				speedL *= -1
-				speedR *= -1
+				speedX *= -1
+				speedX *= -1
 				reverseX = false
 				iter = 0
 			}
 			if (reverseY) {
-				speedT *= -1
-				speedB *= -1
+				speedY *= -1
+				speedY *= -1
 				reverseY = false
 				iter = 0
 			}
