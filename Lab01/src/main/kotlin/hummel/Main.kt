@@ -87,15 +87,15 @@ fun main() {
 		ExUser32.INSTANCE.DispatchMessage(msg)
 
 		val reverse = reverseX || reverseY
-		var moved = false
+		var movedViaKeyboard = false
+
 		if (msg.message == WM_KEYDOWN) {
 			clearAndUpdate(hwnd, squareRect, isSnakeMode)
-			val keyCode = msg.wParam.toInt()
-			when (keyCode) {
+			when (msg.wParam.toInt()) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
 					squareRect.left -= speedX
 					squareRect.right -= speedX
-					moved = true
+					movedViaKeyboard = true
 					if (reverse) {
 						iter++
 					}
@@ -104,7 +104,7 @@ fun main() {
 				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
 					squareRect.left += speedX
 					squareRect.right += speedX
-					moved = true
+					movedViaKeyboard = true
 					if (reverse) {
 						iter++
 					}
@@ -113,7 +113,7 @@ fun main() {
 				KeyEvent.VK_UP, KeyEvent.VK_W -> {
 					squareRect.top -= speedY
 					squareRect.bottom -= speedY
-					moved = true
+					movedViaKeyboard = true
 					if (reverse) {
 						iter++
 					}
@@ -122,7 +122,7 @@ fun main() {
 				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
 					squareRect.top += speedY
 					squareRect.bottom += speedY
-					moved = true
+					movedViaKeyboard = true
 					if (reverse) {
 						iter++
 					}
@@ -146,6 +146,7 @@ fun main() {
 				}
 			}
 		}
+
 		if (msg.message == WM_MOUSEMOVE) {
 			mouseX = msg.lParam.toInt() and 0xFFFF
 			mouseY = (msg.lParam.toInt() shr 16) and 0xFFFF
@@ -200,10 +201,10 @@ fun main() {
 					squareRect.bottom += speedY
 				}
 			}
-			moved = true
+			movedViaKeyboard = true
 		}
 
-		if (moved) {
+		if (movedViaKeyboard) {
 			if (squareRect.left < 0) {
 				squareRect.right -= squareRect.left
 				squareRect.left = 0
