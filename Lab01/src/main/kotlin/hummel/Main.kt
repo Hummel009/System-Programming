@@ -256,7 +256,7 @@ private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
 }
 
 enum class HotKeys {
-	X, Z, C
+	Z, X, C
 }
 
 private fun Color.toDword(): DWORD {
