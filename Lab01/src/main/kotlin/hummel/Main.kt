@@ -132,14 +132,8 @@ fun main() {
 
 		if (msg.message == WM_HOTKEY) {
 			when (msg.wParam.toInt()) {
-				HotKeys.X.ordinal -> {
-					break@loop
-				}
-
-				HotKeys.Z.ordinal -> {
-					isSnakeMode = true
-				}
-
+				HotKeys.X.ordinal -> break@loop
+				HotKeys.Z.ordinal -> isSnakeMode = true
 				HotKeys.C.ordinal -> {
 					speedX *= 2
 					speedY *= 2
