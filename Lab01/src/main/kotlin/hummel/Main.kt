@@ -133,11 +133,11 @@ fun main() {
 		if (msg.message == WM_HOTKEY) {
 			when (msg.wParam.toInt()) {
 				HotKeys.X.ordinal -> {
-					isSnakeMode = true
+					break@loop
 				}
 
 				HotKeys.Z.ordinal -> {
-					break@loop
+					isSnakeMode = true
 				}
 
 				HotKeys.C.ordinal -> {
