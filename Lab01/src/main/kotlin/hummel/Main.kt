@@ -131,11 +131,19 @@ fun main() {
 		}
 
 		if (msg.message == WM_HOTKEY) {
-			if (msg.wParam.toInt() == HotKeys.X.ordinal) {
-				isSnakeMode = true
-			}
-			if (msg.wParam.toInt() == HotKeys.Z.ordinal) {
-				break@loop
+			when (msg.wParam.toInt()) {
+				HotKeys.X.ordinal -> {
+					isSnakeMode = true
+				}
+
+				HotKeys.Z.ordinal -> {
+					break@loop
+				}
+
+				HotKeys.C.ordinal -> {
+					speedX *= 2
+					speedY *= 2
+				}
 			}
 		}
 		if (msg.message == WM_MOUSEMOVE) {
@@ -253,7 +261,7 @@ private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
 }
 
 enum class HotKeys {
-	X, Z
+	X, Z, C
 }
 
 private fun Color.toDword(): DWORD {
