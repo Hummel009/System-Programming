@@ -8,6 +8,9 @@ import java.awt.event.KeyEvent
 import kotlin.experimental.and
 
 const val WM_MOUSEWHEEL: Int = 0x020A
+const val WM_MOUSEMOVE: Int = 0x0200
+const val WM_LBUTTONDOWN: Int = 0x0201
+const val WM_LBUTTONUP: Int = 0x0202
 
 fun main() {
 	val className = "RenderingRectangle"
@@ -78,6 +81,9 @@ fun main() {
 	var reverseY = false
 	var iter = 0
 	var snakeMode = false
+	var isMousePressed = false
+	var mouseX = 0
+	var mouseY = 0
 	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
@@ -132,6 +138,38 @@ fun main() {
 			}
 			if (msg.wParam.toInt() == HotKeys.Z.ordinal) {
 				break@loop
+			}
+		}
+		if (msg.message == WM_MOUSEMOVE) {
+			mouseX = msg.lParam.toInt() and 0xFFFF
+			mouseY = (msg.lParam.toInt() shr 16) and 0xFFFF
+		}
+
+		if (msg.message == WM_LBUTTONDOWN) {
+			isMousePressed = true
+		}
+
+		if (msg.message == WM_LBUTTONUP) {
+			isMousePressed = false
+		}
+
+		if (isMousePressed) {
+			clearAndUpdate(hwnd, squareRect, snakeMode)
+			if (mouseX > squareRect.left) {
+				squareRect.left += speedL
+				squareRect.right += speedR
+			}
+			if (mouseY > squareRect.bottom) {
+				squareRect.bottom += speedB
+				squareRect.top += speedT
+			}
+			if (mouseX < squareRect.left) {
+				squareRect.left -= speedL
+				squareRect.right -= speedR
+			}
+			if (mouseY < squareRect.bottom) {
+				squareRect.bottom -= speedB
+				squareRect.top -= speedT
 			}
 		}
 
