@@ -11,7 +11,7 @@ const val WM_MOUSEWHEEL: Int = 0x020A
 
 fun main() {
 	val className = "RenderingRectangle"
-	val windowTitle = "Kotlin JNA WINAPI Test"
+	val windowTitle = "Windows API: Kotlin + JNA"
 
 	val ps = ExUser32.PAINTSTRUCT()
 	val squareRect = RECT()
@@ -53,8 +53,8 @@ fun main() {
 	val screenSize = Toolkit.getDefaultToolkit().screenSize
 	val screenWidth = screenSize.getWidth().toInt()
 	val screenHeight = screenSize.getHeight().toInt()
-	val windowWidth = 400
-	val windowHeight = 300
+	val windowWidth = 1280
+	val windowHeight = 720
 	val x = (screenWidth - windowWidth) / 2
 	val y = (screenHeight - windowHeight) / 2
 
@@ -65,6 +65,10 @@ fun main() {
 	ExUser32.INSTANCE.ShowWindow(hwnd, SW_SHOW)
 	ExUser32.INSTANCE.UpdateWindow(hwnd)
 
+	for (key in HotKeys.values()) {
+		ExUser32.INSTANCE.RegisterHotKey(hwnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
+	}
+
 	val msg = MSG()
 	var speedL = 10
 	var speedR = 10
@@ -73,14 +77,15 @@ fun main() {
 	var reverseX = false
 	var reverseY = false
 	var iter = 0
-	while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
+	var snakeMode = false
+	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
 
 		val reverse = reverseX || reverseY
 		var moved = false
 		if (msg.message == WM_KEYDOWN) {
-			clearAndUpdate(hwnd, squareRect)
+			clearAndUpdate(hwnd, squareRect, snakeMode)
 			val keyCode = msg.wParam.toInt()
 			when (keyCode) {
 				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
@@ -121,8 +126,17 @@ fun main() {
 			}
 		}
 
+		if (msg.message == WM_HOTKEY) {
+			if (msg.wParam.toInt() == HotKeys.X.ordinal) {
+				snakeMode = true
+			}
+			if (msg.wParam.toInt() == HotKeys.Z.ordinal) {
+				break@loop
+			}
+		}
+
 		if (msg.message == WM_MOUSEWHEEL) {
-			clearAndUpdate(hwnd, squareRect)
+			clearAndUpdate(hwnd, squareRect, snakeMode)
 			val wheelDelta = (msg.wParam.toInt() shr 16)
 			val isShiftPressed = (ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
 			if (isShiftPressed) {
@@ -192,12 +206,18 @@ fun main() {
 	}
 }
 
-private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT) {
-	val hdc = ExUser32.INSTANCE.GetDC(hwnd)
-	val whiteBrush = ExGDI32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
-	ExUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
-	ExUser32.INSTANCE.ReleaseDC(hwnd, hdc)
+private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
+	if (!snakeMode) {
+		val hdc = ExUser32.INSTANCE.GetDC(hwnd)
+		val whiteBrush = ExGDI32.INSTANCE.CreateSolidBrush(Color.WHITE.toDword())
+		ExUser32.INSTANCE.FillRect(hdc, squareRect, whiteBrush)
+		ExUser32.INSTANCE.ReleaseDC(hwnd, hdc)
+	}
 	ExUser32.INSTANCE.InvalidateRect(hwnd, null, true)
+}
+
+enum class HotKeys {
+	X, Z
 }
 
 private fun Color.toDword(): DWORD {
