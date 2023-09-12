@@ -203,13 +203,11 @@ fun main() {
 				squareRect.right -= squareRect.left
 				squareRect.left = 0
 				speedX *= -1
-				speedX *= -1
 				reverseX = true
 			}
 			if (squareRect.right > (windowWidth - 18)) {
 				squareRect.left -= squareRect.right - (windowWidth - 18)
 				squareRect.right = (windowWidth - 18)
-				speedX *= -1
 				speedX *= -1
 				reverseX = true
 			}
@@ -217,13 +215,11 @@ fun main() {
 				squareRect.bottom -= squareRect.top
 				squareRect.top = 0
 				speedY *= -1
-				speedY *= -1
 				reverseY = true
 			}
 			if (squareRect.bottom > (windowHeight - 47)) {
 				squareRect.top -= squareRect.bottom - (windowHeight - 47)
 				squareRect.bottom = (windowHeight - 47)
-				speedY *= -1
 				speedY *= -1
 				reverseY = true
 			}
@@ -231,12 +227,10 @@ fun main() {
 		if (reverse && iter == 5) {
 			if (reverseX) {
 				speedX *= -1
-				speedX *= -1
 				reverseX = false
 				iter = 0
 			}
 			if (reverseY) {
-				speedY *= -1
 				speedY *= -1
 				reverseY = false
 				iter = 0
