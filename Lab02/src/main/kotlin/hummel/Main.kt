@@ -161,25 +161,6 @@ private fun launchTable() {
 }
 
 private fun redrawCircle(hdc: HDC?) {
-	val hFont = ExGDI32.INSTANCE.CreateFontA(
-		16,
-		0,
-		0,
-		0,
-		FW_NORMAL,
-		0,
-		0,
-		0,
-		DEFAULT_CHARSET,
-		OUT_OUTLINE_PRECIS,
-		CLIP_DEFAULT_PRECIS,
-		ANTIALIASED_QUALITY,
-		VARIABLE_PITCH,
-		"Arial"
-	)
-	val hOldFont = ExGDI32.INSTANCE.SelectObject(hdc, hFont)
-	ExGDI32.INSTANCE.SetTextColor(hdc, Color.black.toDword())
-
 	val text = "Lorem ipsum dolor sit amet "
 	val textLength = text.length
 
@@ -198,9 +179,6 @@ private fun redrawCircle(hdc: HDC?) {
 
 		angle += (2 * 3.14159265359) / textLength
 	}
-
-	ExGDI32.INSTANCE.SelectObject(hdc, hOldFont)
-	ExGDI32.INSTANCE.DeleteObject(hFont)
 }
 
 private fun redrawTable(hdc: HDC?, rc: RECT) {
