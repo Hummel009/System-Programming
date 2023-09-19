@@ -35,6 +35,5 @@ internal interface ExUser32 : User32 {
 	fun BeginPaint(hWnd: HWND?, lpPaint: PAINTSTRUCT?): HDC?
 	fun EndPaint(hWnd: HWND?, lpPaint: PAINTSTRUCT?): Boolean
 	fun FillRect(hDC: HDC?, lprc: RECT?, hbr: HBRUSH?): Int
-	fun GetKeyState(nVirtKey: Int): Short
 	fun DrawText(hdc: HDC?, lpchText: String?, cchText: Int, lprc: RECT?, format: Int): Int
 }
