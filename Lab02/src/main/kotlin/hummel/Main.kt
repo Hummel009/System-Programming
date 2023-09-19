@@ -111,7 +111,7 @@ private fun launchCircle() {
 }
 
 private fun launchTable() {
-	val className = "RenderingText"
+	val className = "RenderingTable"
 	val windowTitle = "Windows API: Kotlin + JNA"
 
 	val wc = WNDCLASSEX()
@@ -180,7 +180,7 @@ private fun redrawCircle(hdc: HDC?) {
 	val hOldFont = ExGDI32.INSTANCE.SelectObject(hdc, hFont)
 	ExGDI32.INSTANCE.SetTextColor(hdc, Color.black.toDword())
 
-	val text = "Hello, World!"
+	val text = "Lorem ipsum dolor sit amet "
 	val textLength = text.length
 
 	val radius = 200
@@ -191,8 +191,8 @@ private fun redrawCircle(hdc: HDC?) {
 	var angle = 0.0
 
 	for (i in 0 until textLength) {
-		val x = centerX + (radius * cos(angle))
-		val y = centerY + (radius * sin(angle))
+		val x = centerX - (radius * cos(angle))
+		val y = centerY - (radius * sin(angle))
 
 		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
 
