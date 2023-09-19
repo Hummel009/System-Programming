@@ -98,7 +98,7 @@ private fun launchCircle() {
 
 	ExUser32.INSTANCE.RegisterClassEx(wc)
 
-	val hWnd = createWindowInCenter(className, windowTitle, 1280, 720)
+	val hWnd = createWindowInCenter(className, windowTitle, 720, 720)
 
 	ExUser32.INSTANCE.ShowWindow(hWnd, SW_SHOW)
 	ExUser32.INSTANCE.UpdateWindow(hWnd)
@@ -185,8 +185,8 @@ private fun redrawCircle(hdc: HDC?) {
 
 	val radius = 200
 
-	val centerX = 400
-	val centerY = 300
+	val centerX = 360
+	val centerY = 360
 
 	var angle = 0.0
 
