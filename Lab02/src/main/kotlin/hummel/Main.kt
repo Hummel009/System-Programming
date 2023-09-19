@@ -44,13 +44,9 @@ fun main() {
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 			frame.setSize(350, 150)
 			val button1 = JButton("Launch: Table with the text")
-			button1.addActionListener {
-				launchTable()
-			}
+			button1.addActionListener { launchTable() }
 			val button2 = JButton("Launch: Circle with the text")
-			button2.addActionListener {
-				launchCircle()
-			}
+			button2.addActionListener { launchCircle() }
 			val panel = JPanel()
 			panel.setLayout(FlowLayout())
 			panel.add(button1)
@@ -164,18 +160,6 @@ private fun launchTable() {
 	}
 }
 
-private fun createWindowInCenter(className: String, windowTitle: String, width: Int, height: Int): HWND {
-	val screenSize = Toolkit.getDefaultToolkit().screenSize
-	val screenWidth = screenSize.getWidth().toInt()
-	val screenHeight = screenSize.getHeight().toInt()
-	val x = (screenWidth - width) / 2
-	val y = (screenHeight - height) / 2
-
-	return ExUser32.INSTANCE.CreateWindowEx(
-		0, className, windowTitle, WS_OVERLAPPEDWINDOW or WS_SIZEBOX, x, y, width, height, null, null, null, null
-	)
-}
-
 private fun redrawCircle(hdc: HDC?) {
 	val hFont = ExGDI32.INSTANCE.CreateFontA(
 		16,
@@ -238,6 +222,18 @@ private fun redrawTable(hdc: HDC?, rc: RECT) {
 			}
 		}
 	}
+}
+
+private fun createWindowInCenter(className: String, windowTitle: String, width: Int, height: Int): HWND {
+	val screenSize = Toolkit.getDefaultToolkit().screenSize
+	val screenWidth = screenSize.getWidth().toInt()
+	val screenHeight = screenSize.getHeight().toInt()
+	val x = (screenWidth - width) / 2
+	val y = (screenHeight - height) / 2
+
+	return ExUser32.INSTANCE.CreateWindowEx(
+		0, className, windowTitle, WS_OVERLAPPEDWINDOW or WS_SIZEBOX, x, y, width, height, null, null, null, null
+	)
 }
 
 private fun Color.toDword(): DWORD {
