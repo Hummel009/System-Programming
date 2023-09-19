@@ -16,16 +16,17 @@ fun main() {
 	val className = "RenderingRectangle"
 	val windowTitle = "Windows API: Kotlin + JNA"
 
-	val ps = ExUser32.PAINTSTRUCT()
-	val squareRect = RECT()
-	squareRect.left = 10
-	squareRect.top = 10
-	squareRect.right = 30
-	squareRect.bottom = 30
+	val rc = RECT()
+	rc.left = 10
+	rc.top = 10
+	rc.right = 30
+	rc.bottom = 30
 
-	val windowClass = WNDCLASSEX()
-	windowClass.hInstance = null
-	windowClass.lpfnWndProc = WindowProc { hwnd, uMsg, wParam, lParam ->
+	val wc = WNDCLASSEX()
+	wc.hInstance = null
+	wc.lpszClassName = className
+	wc.lpfnWndProc = WindowProc { hWnd, uMsg, wParam, lParam ->
+		val ps = ExUser32.PAINTSTRUCT()
 		when (uMsg) {
 			WM_DESTROY -> {
 				ExUser32.INSTANCE.PostQuitMessage(0)
@@ -37,39 +38,29 @@ fun main() {
 			}
 
 			WM_PAINT -> {
-				val hdc = ExUser32.INSTANCE.BeginPaint(hwnd, ps)
-				val redBrush = ExGDI32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
+				val hdc = ExUser32.INSTANCE.BeginPaint(hWnd, ps)
+				val brush = ExGDI32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
 
-				ExUser32.INSTANCE.FillRect(hdc, squareRect, redBrush)
-				ExUser32.INSTANCE.EndPaint(hwnd, ps)
+				ExUser32.INSTANCE.FillRect(hdc, rc, brush)
+				ExUser32.INSTANCE.EndPaint(hWnd, ps)
 				LRESULT(0)
 			}
 
-			else -> ExUser32.INSTANCE.DefWindowProc(hwnd, uMsg, wParam, lParam)
+			else -> ExUser32.INSTANCE.DefWindowProc(hWnd, uMsg, wParam, lParam)
 		}
 	}
-	windowClass.lpszClassName = className
-	windowClass.cbSize = windowClass.size()
 
-	ExUser32.INSTANCE.RegisterClassEx(windowClass)
+	ExUser32.INSTANCE.RegisterClassEx(wc)
 
-	val screenSize = Toolkit.getDefaultToolkit().screenSize
-	val screenWidth = screenSize.getWidth().toInt()
-	val screenHeight = screenSize.getHeight().toInt()
-	val windowWidth = 1280
-	val windowHeight = 720
-	val x = (screenWidth - windowWidth) / 2
-	val y = (screenHeight - windowHeight) / 2
+	val width = 1280
+	val height = 720
+	val hWnd = createWindowInCenter(className, windowTitle, width, height)
 
-	val hwnd = ExUser32.INSTANCE.CreateWindowEx(
-		0, className, windowTitle, WS_OVERLAPPEDWINDOW, x, y, windowWidth, windowHeight, null, null, null, null
-	)
-
-	ExUser32.INSTANCE.ShowWindow(hwnd, SW_SHOW)
-	ExUser32.INSTANCE.UpdateWindow(hwnd)
+	ExUser32.INSTANCE.ShowWindow(hWnd, SW_SHOW)
+	ExUser32.INSTANCE.UpdateWindow(hWnd)
 
 	for (key in HotKeys.values()) {
-		ExUser32.INSTANCE.RegisterHotKey(hwnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
+		ExUser32.INSTANCE.RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
 	}
 
 	val msg = MSG()
@@ -89,141 +80,145 @@ fun main() {
 		val reverse = reverseX || reverseY
 		var movedViaKeyboard = false
 
-		if (msg.message == WM_KEYDOWN) {
-			clearAndUpdate(hwnd, squareRect, isSnakeMode)
-			when (msg.wParam.toInt()) {
-				KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
-					squareRect.left -= speedX
-					squareRect.right -= speedX
-					movedViaKeyboard = true
-					if (reverse) {
-						iter++
+		when (msg.message) {
+			WM_KEYDOWN -> {
+				clearAndUpdate(hWnd, rc, isSnakeMode)
+				when (msg.wParam.toInt()) {
+					KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
+						rc.left -= speedX
+						rc.right -= speedX
+						movedViaKeyboard = true
+						if (reverse) {
+							iter++
+						}
 					}
-				}
 
-				KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
-					squareRect.left += speedX
-					squareRect.right += speedX
-					movedViaKeyboard = true
-					if (reverse) {
-						iter++
+					KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
+						rc.left += speedX
+						rc.right += speedX
+						movedViaKeyboard = true
+						if (reverse) {
+							iter++
+						}
 					}
-				}
 
-				KeyEvent.VK_UP, KeyEvent.VK_W -> {
-					squareRect.top -= speedY
-					squareRect.bottom -= speedY
-					movedViaKeyboard = true
-					if (reverse) {
-						iter++
+					KeyEvent.VK_UP, KeyEvent.VK_W -> {
+						rc.top -= speedY
+						rc.bottom -= speedY
+						movedViaKeyboard = true
+						if (reverse) {
+							iter++
+						}
 					}
-				}
 
-				KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
-					squareRect.top += speedY
-					squareRect.bottom += speedY
-					movedViaKeyboard = true
-					if (reverse) {
-						iter++
+					KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
+						rc.top += speedY
+						rc.bottom += speedY
+						movedViaKeyboard = true
+						if (reverse) {
+							iter++
+						}
 					}
 				}
 			}
-		}
 
-		if (msg.message == WM_HOTKEY) {
-			when (msg.wParam.toInt()) {
-				HotKeys.X.ordinal -> break@loop
-				HotKeys.Z.ordinal -> isSnakeMode = true
-				HotKeys.C.ordinal -> {
-					speedX *= 2
-					speedY *= 2
+			WM_HOTKEY -> {
+				when (msg.wParam.toInt()) {
+					HotKeys.X.ordinal -> break@loop
+					HotKeys.Z.ordinal -> isSnakeMode = true
+					HotKeys.C.ordinal -> {
+						speedX *= 2
+						speedY *= 2
+					}
 				}
 			}
-		}
 
-		if (msg.message == WM_MOUSEMOVE) {
-			mouseX = msg.lParam.toInt() and 0xFFFF
-			mouseY = (msg.lParam.toInt() shr 16) and 0xFFFF
-		}
+			WM_MOUSEMOVE -> {
+				mouseX = msg.lParam.toInt() and 0xFFFF
+				mouseY = (msg.lParam.toInt() shr 16) and 0xFFFF
+			}
 
-		if (msg.message == WM_LBUTTONDOWN) {
-			isMousePressed = true
-		}
+			WM_LBUTTONDOWN -> {
+				isMousePressed = true
+			}
 
-		if (msg.message == WM_LBUTTONUP) {
-			isMousePressed = false
+			WM_LBUTTONUP -> {
+				isMousePressed = false
+			}
+
+			WM_MOUSEWHEEL -> {
+				clearAndUpdate(hWnd, rc, isSnakeMode)
+				val wheelDelta = (msg.wParam.toInt() shr 16)
+				val isShiftPressed =
+					(ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
+				if (isShiftPressed) {
+					if (wheelDelta > 0) {
+						rc.left -= speedX
+						rc.right -= speedX
+					} else {
+						rc.left += speedX
+						rc.right += speedX
+					}
+				} else {
+					if (wheelDelta > 0) {
+						rc.top -= speedY
+						rc.bottom -= speedY
+					} else {
+						rc.top += speedY
+						rc.bottom += speedY
+					}
+				}
+				movedViaKeyboard = true
+			}
 		}
 
 		if (isMousePressed) {
-			clearAndUpdate(hwnd, squareRect, isSnakeMode)
-			if (mouseX > squareRect.left) {
-				squareRect.left += speedX
-				squareRect.right += speedX
+			clearAndUpdate(hWnd, rc, isSnakeMode)
+			if (mouseX > rc.left) {
+				rc.left += speedX
+				rc.right += speedX
 			}
-			if (mouseX < squareRect.left) {
-				squareRect.left -= speedX
-				squareRect.right -= speedX
+			if (mouseX < rc.left) {
+				rc.left -= speedX
+				rc.right -= speedX
 			}
-			if (mouseY > squareRect.bottom) {
-				squareRect.bottom += speedY
-				squareRect.top += speedY
+			if (mouseY > rc.bottom) {
+				rc.bottom += speedY
+				rc.top += speedY
 			}
-			if (mouseY < squareRect.bottom) {
-				squareRect.bottom -= speedY
-				squareRect.top -= speedY
+			if (mouseY < rc.bottom) {
+				rc.bottom -= speedY
+				rc.top -= speedY
 			}
-		}
-
-		if (msg.message == WM_MOUSEWHEEL) {
-			clearAndUpdate(hwnd, squareRect, isSnakeMode)
-			val wheelDelta = (msg.wParam.toInt() shr 16)
-			val isShiftPressed = (ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
-			if (isShiftPressed) {
-				if (wheelDelta > 0) {
-					squareRect.left -= speedX
-					squareRect.right -= speedX
-				} else {
-					squareRect.left += speedX
-					squareRect.right += speedX
-				}
-			} else {
-				if (wheelDelta > 0) {
-					squareRect.top -= speedY
-					squareRect.bottom -= speedY
-				} else {
-					squareRect.top += speedY
-					squareRect.bottom += speedY
-				}
-			}
-			movedViaKeyboard = true
 		}
 
 		if (movedViaKeyboard) {
-			if (squareRect.left < 0) {
-				squareRect.right -= squareRect.left
-				squareRect.left = 0
+			if (rc.left < 0) {
+				rc.right -= rc.left
+				rc.left = 0
 				speedX *= -1
 				reverseX = true
 			}
-			if (squareRect.right > (windowWidth - 18)) {
-				squareRect.left -= squareRect.right - (windowWidth - 18)
-				squareRect.right = (windowWidth - 18)
+			if (rc.right > (width - 18)) {
+				rc.left -= rc.right - (width - 18)
+				rc.right = (width - 18)
 				speedX *= -1
 				reverseX = true
 			}
-			if (squareRect.top < 0) {
-				squareRect.bottom -= squareRect.top
-				squareRect.top = 0
+			if (rc.top < 0) {
+				rc.bottom -= rc.top
+				rc.top = 0
 				speedY *= -1
 				reverseY = true
 			}
-			if (squareRect.bottom > (windowHeight - 47)) {
-				squareRect.top -= squareRect.bottom - (windowHeight - 47)
-				squareRect.bottom = (windowHeight - 47)
+			if (rc.bottom > (height - 47)) {
+				rc.top -= rc.bottom - (height - 47)
+				rc.bottom = (height - 47)
 				speedY *= -1
 				reverseY = true
 			}
 		}
+
 		if (reverse && iter == 5) {
 			if (reverseX) {
 				speedX *= -1
@@ -239,6 +234,18 @@ fun main() {
 	}
 }
 
+private fun createWindowInCenter(className: String, windowTitle: String, width: Int, height: Int): HWND {
+	val screenSize = Toolkit.getDefaultToolkit().screenSize
+	val screenWidth = screenSize.getWidth().toInt()
+	val screenHeight = screenSize.getHeight().toInt()
+	val x = (screenWidth - width) / 2
+	val y = (screenHeight - height) / 2
+
+	return ExUser32.INSTANCE.CreateWindowEx(
+		0, className, windowTitle, WS_OVERLAPPEDWINDOW or WS_SIZEBOX, x, y, width, height, null, null, null, null
+	)
+}
+
 private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
 	if (!snakeMode) {
 		val hdc = ExUser32.INSTANCE.GetDC(hwnd)
@@ -249,10 +256,10 @@ private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
 	ExUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 }
 
-enum class HotKeys {
-	Z, X, C
-}
-
 private fun Color.toDword(): DWORD {
 	return DWORD((blue shl 16 or (green shl 8) or red).toLong())
+}
+
+enum class HotKeys {
+	Z, X, C
 }
