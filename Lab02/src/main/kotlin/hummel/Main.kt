@@ -21,12 +21,6 @@ const val DT_CENTER: Int = 0x00000001
 const val DT_VCENTER: Int = 0x00000004
 const val CS_VREDRAW: Int = 0x0001
 const val CS_HREDRAW: Int = 0x0002
-const val FW_NORMAL: Int = 400
-const val DEFAULT_CHARSET: Int = 1
-const val OUT_OUTLINE_PRECIS: Int = 8
-const val CLIP_DEFAULT_PRECIS: Int = 0
-const val ANTIALIASED_QUALITY: Int = 4
-const val VARIABLE_PITCH: Int = 2
 
 val rand: Random = Random()
 val tableData: Array<Array<String>> = Array(n) { Array(m) { (1..rand.nextInt(3) + 1).joinToString("\r\n") { "Text" } } }
