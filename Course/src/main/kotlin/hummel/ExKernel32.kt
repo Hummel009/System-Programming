@@ -3,17 +3,13 @@ package hummel
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.Structure
-import com.sun.jna.platform.win32.WinNT.HANDLE
-import com.sun.jna.win32.StdCallLibrary
+import com.sun.jna.platform.win32.Kernel32
 
-
-internal interface ExKernel32 : StdCallLibrary {
+internal interface ExKernel32 : Kernel32 {
 	companion object {
-		val INSTANCE = Native.load("kernel32", ExKernel32::class.java)
+		val INSTANCE: ExKernel32 = Native.load("kernel32", ExKernel32::class.java)
 	}
 
-	fun OpenProcess(dwDesiredAccess: Int, bInheritHandle: Boolean, dwProcessId: Int): HANDLE?
-	fun CloseHandle(hObject: HANDLE?): Boolean
 	fun GetSystemInfo(lpSystemInfo: SYSTEM_INFO?): Int
 
 	open class SYSTEM_INFO : Structure() {
