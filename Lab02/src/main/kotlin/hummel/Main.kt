@@ -21,6 +21,7 @@ const val DT_CENTER: Int = 0x00000001
 const val DT_VCENTER: Int = 0x00000004
 const val CS_VREDRAW: Int = 0x0001
 const val CS_HREDRAW: Int = 0x0002
+const val GM_ADVANCED: Int = 2
 
 val rand: Random = Random()
 val tableData: Array<Array<String>> = Array(n) { Array(m) { (1..rand.nextInt(3) + 1).joinToString("\r\n") { "Text" } } }
@@ -155,23 +156,27 @@ private fun launchTable() {
 }
 
 private fun redrawCircle(hdc: HDC?) {
-	val text = "Lorem ipsum dolor sit amet "
+	val text = "Lorem ipsum dolor sit amet"
 	val textLength = text.length
 
 	val radius = 200
-
-	val centerX = 360
-	val centerY = 360
-
-	var angle = 0.0
+	val xForm = ExGDI32.XFORM()
+	xForm.eDx = 360.toFloat()
+	xForm.eDy = 360.toFloat()
+	var angle = 0
 
 	for (i in 0 until textLength) {
-		val x = centerX - (radius * cos(angle))
-		val y = centerY - (radius * sin(angle))
+		val temp = angle.toRadian()
+		xForm.eM11 = cos(temp).toFloat()
+		xForm.eM12 = sin(temp).toFloat()
+		xForm.eM21 = -sin(temp).toFloat()
+		xForm.eM22 = cos(temp).toFloat()
+		ExGDI32.INSTANCE.SetGraphicsMode(hdc, GM_ADVANCED)
+		ExGDI32.INSTANCE.SetWorldTransform(hdc, xForm)
 
-		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+		angle += 360 / textLength - if (angle >= 360) 360 else 0
 
-		angle += (2 * 3.14159265359) / textLength
+		ExGDI32.INSTANCE.TextOutA(hdc, radius, 0, text[i].toString(), 1)
 	}
 }
 
@@ -208,6 +213,6 @@ private fun createWindowInCenter(className: String, windowTitle: String, width: 
 	)
 }
 
-private fun Color.toDword(): DWORD {
-	return DWORD((blue shl 16 or (green shl 8) or red).toLong())
-}
+private fun Color.toDword(): DWORD = DWORD((blue shl 16 or (green shl 8) or red).toLong())
+
+private fun Int.toRadian(): Double = this * 3.14159265359 / 180
