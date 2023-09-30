@@ -7,11 +7,11 @@ using namespace std;
 
 int main()
 {
-	string localString = "Hummel010";
+	string str = "Hummel010";
 
 	while (1)
 	{
-		cout << localString.c_str() << endl;
-		_getch();
+		cout << str << endl;
+		Sleep(500);
 	}
 }

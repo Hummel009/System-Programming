@@ -1,1 +1,3 @@
-__declspec(dllexport) void replaceFunction(const char *data, const char *replacement);
+using namespace std;
+
+__declspec(dllexport) void replaceFunction(string data, string replacement);

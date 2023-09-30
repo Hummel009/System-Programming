@@ -8,54 +8,39 @@
 
 using namespace std;
 
-void replaceFunction(const char *data, const char *replacement)
+void replaceFunction(string data, string replacement)
 {
-	HANDLE process = GetCurrentProcess();
-	size_t len = strlen(data);
-	size_t replacementLength = strlen(replacement);
+    HANDLE process = GetCurrentProcess();
 
-	if (process)
-	{
-		SYSTEM_INFO si;
-		GetSystemInfo(&si);
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
 
-		MEMORY_BASIC_INFORMATION info;
-		vector<char> chunk;
-		char *p = 0;
-		while (p < si.lpMaximumApplicationAddress)
-		{
-			if (VirtualQueryEx(process, p, &info, sizeof(info)) == sizeof(info))
-			{
-				if (info.State == MEM_COMMIT && info.AllocationProtect == PAGE_READWRITE)
-				{
-					p = (char *)info.BaseAddress;
-					chunk.resize(info.RegionSize);
-					SIZE_T bytesRead;
+    MEMORY_BASIC_INFORMATION info;
+    char *p = 0;
 
-					try
-					{
-						if (ReadProcessMemory(process, p, &chunk[0], info.RegionSize, &bytesRead))
-						{
-							for (size_t i = 0; i < (bytesRead - len); ++i)
-							{
-								if (memcmp(data, &chunk[i], len) == 0)
-								{
-									char *ref = (char *)p + i;
-									for (int j = 0; j < replacementLength; j++)
-									{
-										ref[j] = replacement[j];
-									}
-									ref[replacementLength] = 0;
-								}
-							}
-						}
-					}
-					catch (bad_alloc &e)
-					{
-					}
-				}
-				p += info.RegionSize;
-			}
-		}
-	}
+    while (p < si.lpMaximumApplicationAddress)
+    {
+        if (VirtualQueryEx(process, p, &info, sizeof(info)) == sizeof(info))
+        {
+            if (info.State == MEM_COMMIT && info.AllocationProtect == PAGE_READWRITE)
+            {
+                std::vector<char> chunk(info.RegionSize);
+
+                SIZE_T bytesRead;
+                if (ReadProcessMemory(process, p, &chunk[0], info.RegionSize, &bytesRead))
+                {
+                    for (size_t i = 0; i < (bytesRead - data.length()); ++i)
+                    {
+                        if (std::equal(data.begin(), data.end(), &chunk[i]))
+                        {
+                            char *ref = static_cast<char *>(p) + i;
+                            std::copy(replacement.begin(), replacement.end(), ref);
+                            ref[replacement.length()] = 0;
+                        }
+                    }
+                }
+            }
+            p += info.RegionSize;
+        }
+    }
 }

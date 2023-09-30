@@ -5,7 +5,7 @@ using namespace std;
 
 typedef int (*AddFunction)(int, int);
 typedef int (*SubFunction)(int, int);
-typedef void (*PrintFunction)(const char *);
+typedef void (*PrintFunction)(string);
 
 int main()
 {

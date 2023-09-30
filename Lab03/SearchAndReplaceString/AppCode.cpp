@@ -3,7 +3,7 @@
 
 using namespace std;
 
-__declspec(dllimport) void replaceFunction(const char *, const char *);
+__declspec(dllimport) void replaceFunction(string, string);
 
 int main()
 {

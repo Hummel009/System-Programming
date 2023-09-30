@@ -13,7 +13,7 @@ int subFunction(int a, int b)
 	return a - b;
 }
 
-void printFunction(const char *message)
+void printFunction(string message)
 {
 	cout << message << endl;
 }
