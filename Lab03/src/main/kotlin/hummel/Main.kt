@@ -1,31 +1,31 @@
 package hummel
 
 import com.sun.jna.Library
-import com.sun.jna.Memory
 import com.sun.jna.Native
-import com.sun.jna.Pointer
-import com.sun.jna.ptr.PointerByReference
 
+interface ExampleDLL : Library {
+	companion object {
+		val INSTANCE: ExampleDLL = Native.load("ExampleDLL", ExampleDLL::class.java)
+	}
 
-interface ExampleLibrary : Library {
 	fun add(a: Int, b: Int): Int
 	fun sub(a: Int, b: Int): Int
 	fun print(message: String?)
-	fun replaceString(target: String?, search: String?, replace: String?)
+}
 
+interface ReplacementDLL : Library {
 	companion object {
-		val INSTANCE: ExampleLibrary = Native.load("mylibrary", ExampleLibrary::class.java)
+		val INSTANCE: ReplacementDLL = Native.load("ReplacementDLL", ReplacementDLL::class.java)
 	}
+
+	fun replace(data: String?, replacement: String?)
 }
 
 fun main() {
 	System.setProperty("jna.library.path", "lib")
-	println("Result: ${ExampleLibrary.INSTANCE.add(3, 2)}")
-	println("Result: ${ExampleLibrary.INSTANCE.sub(3, 2)}")
-	ExampleLibrary.INSTANCE.print("Hello, Hummel009!")
+	println("Result: ${ExampleDLL.INSTANCE.add(3, 2)}")
+	println("Result: ${ExampleDLL.INSTANCE.sub(3, 2)}")
+	ExampleDLL.INSTANCE.print("Hello, Hummel009!")
 
-	val originalString = "This is a test string. Test."
-	ExampleLibrary.INSTANCE.replaceString(originalString, "Test", "Example")
-
-	println("Updated string: $originalString")
+	ReplacementDLL.INSTANCE.replace("Hummel009's Process", "Hummel Turbamentum's Process")
 }
