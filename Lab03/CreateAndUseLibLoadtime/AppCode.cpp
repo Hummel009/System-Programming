@@ -6,7 +6,8 @@ __declspec(dllimport) int addFunction(int a, int b);
 __declspec(dllimport) int subFunction(int a, int b);
 __declspec(dllimport) void printFunction(string message);
 
-int main() {
+int main()
+{
     int resultAdd = addFunction(5, 3);
     int resultSub = subFunction(8, 4);
 

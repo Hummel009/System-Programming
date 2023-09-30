@@ -3,16 +3,20 @@
 
 using namespace std;
 
-__declspec(dllimport) void replaceFunction(const char*, const char*);
+__declspec(dllimport) void replaceFunction(const char *, const char *);
 
-int main() {
-    string str = "Previous Text";
-    if (replaceFunction) {
+int main()
+{
+	string str = "Previous Text";
+	if (replaceFunction)
+	{
 		cout << "Before replacement: " << str << ";" << endl;
 		replaceFunction("Previous Text", "Replaced Text");
 		cout << "After replacement: " << str << ";" << endl;
-	} else {
+	}
+	else
+	{
 		cout << "Failed to get function pointer!" << endl;
 	}
-    return 0;
+	return 0;
 }
