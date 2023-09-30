@@ -3,6 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+!**/cpp/**/build/
 
 ### IntelliJ IDEA ###
 .idea
@@ -24,6 +25,7 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+!**/cpp/**/bin/
 
 ### NetBeans ###
 /nbproject/private/
