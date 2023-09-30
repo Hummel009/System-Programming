@@ -1,14 +1,35 @@
 #include <iostream>
-#include "Lib.h"
+#include <Windows.h>
+
+using namespace std;
+
+typedef int (*AddFunction)(int, int);
+typedef int (*SubtractFunction)(int, int);
+typedef void (*PrintFunction)(const char*);
 
 int main() {
-    int resultAdd = add(5, 3);
-    int resultSub = sub(8, 4);
+    HINSTANCE hDLL = LoadLibrary("Lib.dll");
 
-    std::cout << "Addition result: " << resultAdd << std::endl;
-    std::cout << "Subtraction result: " << resultSub << std::endl;
+    if (hDLL != NULL) {
+        AddFunction addFunction = (AddFunction)GetProcAddress(hDLL, "addFunction");
+        SubtractFunction subFunction = (SubtractFunction)GetProcAddress(hDLL, "subFunction");
+        PrintFunction printFunction = (PrintFunction)GetProcAddress(hDLL, "printFunction");
 
-    print("Hello from the DLL!");
+        if (addFunction && subFunction && printFunction) {
+            int resultAdd = addFunction(5, 3);
+            int resultSub = subFunction(8, 4);
+
+            cout << "Addition result: " << resultAdd << ";" << endl;
+            cout << "Subtraction result: " << resultSub << ";" << endl;
+
+            printFunction("Hello from the DLL!");
+        } else {
+            cout << "Failed to get function pointers!" << endl;
+        }
+        FreeLibrary(hDLL);
+    } else {
+        cout << "Failed to load DLL!" << endl;
+    }
 
     return 0;
 }

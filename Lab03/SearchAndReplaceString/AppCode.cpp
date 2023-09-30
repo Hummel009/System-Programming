@@ -1,6 +1,7 @@
-#include <stdio.h>
-#include <windows.h>
-#include <string>
+#include <iostream>
+#include <Windows.h>
+
+using namespace std;
 
 typedef void (*ReplaceFunction)(const char*, const char*);
 
@@ -8,22 +9,22 @@ int main() {
     HINSTANCE hDLL = LoadLibrary("Lib.dll");
 
     if (hDLL != NULL) {
-        ReplaceFunction replaceFunction = (ReplaceFunction)GetProcAddress(hDLL, "replace");
+        ReplaceFunction replaceFunction = (ReplaceFunction)GetProcAddress(hDLL, "replaceFunction");
 
-		std::string s = "Previous Text";
+        string str = "Previous Text";
         if (replaceFunction) {
-            printf("Before replacement: %s;\n", s.c_str());
-			
+            cout << "Before replacement: " << str << ";" << endl;
+
             replaceFunction("Previous Text", "Replaced Text");
 
-            printf("After replacement: %s;\n", s.c_str());
+            cout << "After replacement: " << str << ";" << endl;
         } else {
-            printf("Failed to get function pointer\n");
+            cout << "Failed to get function pointer!" << endl;
         }
 
         FreeLibrary(hDLL);
     } else {
-        printf("Failed to load DLL\n");
+        cout << "Failed to load DLL!" << endl;
     }
 
     return 0;

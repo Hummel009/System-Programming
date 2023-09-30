@@ -5,10 +5,12 @@
 #include <vector>
 #include <fstream>
 
+using namespace std;
+
 extern "C"
 {
 
-	__declspec(dllexport) void replace(const char *data, const char *replacement)
+	__declspec(dllexport) void replaceFunction(const char *data, const char *replacement)
 	{
 		HANDLE process = GetCurrentProcess();
 		size_t len = strlen(data);
@@ -20,7 +22,7 @@ extern "C"
 			GetSystemInfo(&si);
 
 			MEMORY_BASIC_INFORMATION info;
-			std::vector<char> chunk;
+			vector<char> chunk;
 			char *p = 0;
 			while (p < si.lpMaximumApplicationAddress)
 			{
@@ -50,7 +52,7 @@ extern "C"
 								}
 							}
 						}
-						catch (std::bad_alloc &e)
+						catch (bad_alloc &e)
 						{
 						}
 					}
