@@ -4,13 +4,11 @@
 #include <stdio.h>
 #include <vector>
 #include <fstream>
+#include "Lib.h"
 
 using namespace std;
 
-extern "C"
-{
-
-	__declspec(dllexport) void replaceFunction(const char *data, const char *replacement)
+void replaceFunction(const char *data, const char *replacement)
 	{
 		HANDLE process = GetCurrentProcess();
 		size_t len = strlen(data);
@@ -61,4 +59,3 @@ extern "C"
 			}
 		}
 	}
-}
