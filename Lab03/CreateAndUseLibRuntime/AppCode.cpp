@@ -37,6 +37,5 @@ int main()
     {
         cout << "Failed to load DLL!" << endl;
     }
-
     return 0;
 }

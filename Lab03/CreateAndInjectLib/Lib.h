@@ -1,0 +1,1 @@
+__declspec(dllexport) void replaceFunction(const char *data, const char *replacement);

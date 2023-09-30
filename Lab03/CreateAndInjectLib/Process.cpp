@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-	string localString = "Hummel009's Process";
+	string localString = "Hummel010";
 
 	while (1)
 	{
