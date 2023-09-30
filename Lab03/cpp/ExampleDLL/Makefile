@@ -9,7 +9,7 @@ BUILD      := build
 INCLUDE    := -Iinclude
 
 LIBRARIES   :=
-DLL_NAME    := mylibrary.dll  # Name your DLL file
+DLL_NAME    := ExampleDLL.dll
 SRCS := $(wildcard $(SRC)/*.cpp)
 OBJS := $(SRCS:$(SRC)/%.cpp=$(BUILD)/%.o)
 
