@@ -8,12 +8,9 @@
 
 using namespace std;
 
-// Функция для замены подстроки в памяти процесса
 void replaceFunction(string data, string replacement)
 {
     HANDLE process = GetCurrentProcess();
-
-    // Получаем информацию о системе
     SYSTEM_INFO si;
     GetSystemInfo(&si);
 
