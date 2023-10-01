@@ -37,26 +37,11 @@ DWORD GetProcessIdByProcessName(const string &processName)
 
 int main()
 {
-    // Задаем имя процесса, который мы хотим найти
     const string processName = "Process1.exe";
     DWORD pid = GetProcessIdByProcessName(processName);
 
-    // Проверяем, был ли процесс найден
-    if (pid == 0)
-    {
-        cout << "Process not found." << endl;
-        return 1;
-    }
-
     // Открываем процесс с полным доступом
     HANDLE hRemoteProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-
-    // Проверяем, успешно ли открытие процесса
-    if (hRemoteProcess == NULL)
-    {
-        cout << "Failed to open process." << endl;
-        return 1;
-    }
 
     // Получаем адрес функции LoadLibraryA из kernel32.dll
     LPVOID threadFunction = (LPVOID)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
@@ -73,10 +58,6 @@ int main()
         // Ждем некоторое время, чтобы поток имел шанс выполниться
         Sleep(1000);
         cout << "Thread created." << endl;
-    }
-    else
-    {
-        cout << "Failed to create thread." << endl;
     }
 
     // Закрываем дескриптор удаленного процесса
