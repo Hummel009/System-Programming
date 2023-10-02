@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: compiled-artifact2
-          path: ./Lab01/build/libs/*.jar
+          path: ./Lab02/build/libs/*.jar
   buildc:
     runs-on: windows-latest
     steps:
@@ -65,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: compiled-artifactc
-          path: ./Lab01/build/libs/*.jar
+          path: ./Course/build/libs/*.jar
