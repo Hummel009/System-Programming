@@ -170,7 +170,7 @@ private fun redrawCircle(hdc: HDC?) {
 	val r3 = 240
 	val r2 = 190
 	val r1 = 140
-	var angle = 0
+	var angle = 0.0
 
 	val text = "Lorem ipsum dolor sit amet"
 	val textLength = text.length
@@ -186,7 +186,7 @@ private fun redrawCircle(hdc: HDC?) {
 		val hFont = ExGDI32.INSTANCE.CreateFontA(
 			24,
 			0,
-			-(angle + 90) * 10,
+			(-(angle + 90) * 10).toInt(),
 			0,
 			FW_NORMAL,
 			FALSE,
@@ -218,7 +218,7 @@ private fun redrawCircle(hdc: HDC?) {
 
 		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
 
-		angle += 360 / textLength - if (angle >= 360) 360 else 0
+		angle += (360 / textLength - if (angle >= 360) 360 else 0) + 0.5
 
 		ExGDI32.INSTANCE.DeleteObject(hFont)
 	}
@@ -261,4 +261,4 @@ private fun createWindowInCenter(className: String, windowTitle: String, width: 
 
 private fun Color.toDword(): DWORD = DWORD((blue shl 16 or (green shl 8) or red).toLong())
 
-private fun Int.toRadian(): Double = this * 3.14159265359 / 180
+private fun Double.toRadian(): Double = this * Math.PI / 180
