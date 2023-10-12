@@ -21,7 +21,14 @@ const val DT_CENTER: Int = 0x00000001
 const val DT_VCENTER: Int = 0x00000004
 const val CS_VREDRAW: Int = 0x0001
 const val CS_HREDRAW: Int = 0x0002
-const val GM_ADVANCED: Int = 2
+const val FW_NORMAL: Int = 400
+const val FALSE: Int = 0
+const val ANSI_CHARSET: Int = 0
+const val OUT_DEFAULT_PRECIS: Int = 0
+const val CLIP_DEFAULT_PRECIS: Int = 0
+const val DEFAULT_QUALITY: Int = 0
+const val DEFAULT_PITCH: Int = 0
+const val FF_SWISS: Int = 2
 
 val rand: Random = Random()
 val tableData: Array<Array<String>> = Array(n) { Array(m) { (1..rand.nextInt(3) + 1).joinToString("\r\n") { "Text" } } }
@@ -156,28 +163,67 @@ private fun launchTable() {
 }
 
 private fun redrawCircle(hdc: HDC?) {
+	ExGDI32.INSTANCE.SaveDC(hdc)
+
+	val cX = 300
+	val cY = 300
+	val r3 = 240
+	val r2 = 190
+	val r1 = 140
+	var angle = 0
+
 	val text = "Lorem ipsum dolor sit amet"
 	val textLength = text.length
 
-	val radius = 200
-	val xForm = ExGDI32.XFORM()
-	xForm.eDx = 360.toFloat()
-	xForm.eDy = 360.toFloat()
-	var angle = 0
+	ExGDI32.INSTANCE.Ellipse(hdc, 50, 50, 550, 550)
+	ExGDI32.INSTANCE.Ellipse(hdc, 100, 100, 500, 500)
+	ExGDI32.INSTANCE.Ellipse(hdc, 150, 150, 450, 450)
+	ExGDI32.INSTANCE.Ellipse(hdc, 200, 200, 400, 400)
+	ExGDI32.INSTANCE.Ellipse(hdc, 250, 250, 350, 350)
+	ExGDI32.INSTANCE.Ellipse(hdc, 290, 290, 310, 310)
 
 	for (i in 0 until textLength) {
+		val hFont = ExGDI32.INSTANCE.CreateFontA(
+			24,
+			0,
+			-(angle + 90) * 10,
+			0,
+			FW_NORMAL,
+			FALSE,
+			FALSE,
+			FALSE,
+			ANSI_CHARSET,
+			OUT_DEFAULT_PRECIS,
+			CLIP_DEFAULT_PRECIS,
+			DEFAULT_QUALITY,
+			DEFAULT_PITCH or FF_SWISS,
+			"Arial"
+		)
+		ExGDI32.INSTANCE.SelectObject(hdc, hFont)
+
 		val temp = angle.toRadian()
-		xForm.eM11 = cos(temp).toFloat()
-		xForm.eM12 = sin(temp).toFloat()
-		xForm.eM21 = -sin(temp).toFloat()
-		xForm.eM22 = cos(temp).toFloat()
-		ExGDI32.INSTANCE.SetGraphicsMode(hdc, GM_ADVANCED)
-		ExGDI32.INSTANCE.SetWorldTransform(hdc, xForm)
+
+		var x = cX + r1 * cos(temp)
+		var y = cY + r1 * sin(temp)
+
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+
+		x = cX + r2 * cos(temp)
+		y = cY + r2 * sin(temp)
+
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+
+		x = cX + r3 * cos(temp)
+		y = cY + r3 * sin(temp)
+
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
 
 		angle += 360 / textLength - if (angle >= 360) 360 else 0
 
-		ExGDI32.INSTANCE.TextOutA(hdc, radius, 0, text[i].toString(), 1)
+		ExGDI32.INSTANCE.DeleteObject(hFont)
 	}
+
+	ExGDI32.INSTANCE.RestoreDC(hdc, -1)
 }
 
 private fun redrawTable(hdc: HDC?, rc: RECT) {
