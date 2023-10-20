@@ -4,7 +4,6 @@ import platform.windows.*
 fun main() {
 	memScoped {
 		val data = "AMOGUS"
-		val replace = "SUS"
 		val name = "Hummel009"
 		val path = "Software\\RegistrySample\\"
 		val szBuf = allocArray<CHARVar>(MAX_PATH)
@@ -26,16 +25,21 @@ fun main() {
 		println(szBuf.toKString())
 
 		val hKeyRe: HKEYVar = alloc()
-		map["openKey2"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, REG_SZ.toUInt(), hKeyRe.ptr)
-		map["setValue2"] = RegSetValueExA(
-			hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf()
-		)
+		val replace = "ABOBUS"
+		map["openKey2"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
+		map["setValue2"] = RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
 		map["closeKey2"] = RegCloseKey(hKeyRe.value)
-		map["getValue2"] = RegGetValueA(
+		map["getValue1"] = RegGetValueA(
 			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
 		)
 
 		println(szBuf.toKString())
+
+		map["deleteValue2"] = RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
+
+		//RegGetKeySecurity
+		//RegNotifyChangeKeyValue
+		//RegSetKeySecurity
 
 		map.forEach { (key, value) -> println("$key, ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
 	}
