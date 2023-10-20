@@ -1,7 +1,7 @@
 import kotlinx.cinterop.*
 import platform.windows.*
 
-val log: MutableMap<String, Int> = mutableMapOf()
+val log: MutableMap<String, String> = mutableMapOf()
 
 fun main() {
 	memScoped {
@@ -38,12 +38,12 @@ fun main() {
 
 		"Delete Key" to RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
 
-		log.forEach { (key, value) -> println("$key: ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
+		log.forEach { (key, value) -> println("$key: $value") }
 	}
 }
 
 private infix fun String.to(signal: Int) {
-	log[this] = signal
+	log[this] = if (signal == ERROR_SUCCESS) "OK" else "NOT OK"
 }
 
 private fun String.sizeOf(): DWORD = encodeToByteArray().toUByteArray().size.toUInt()
