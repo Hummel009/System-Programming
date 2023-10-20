@@ -3,7 +3,6 @@ import platform.windows.*
 
 fun main() {
 	memScoped {
-		val data = "AMOGUS"
 		val name = "Hummel009"
 		val path = "Software\\RegistrySample\\"
 		val szBuf = allocArray<CHARVar>(MAX_PATH)
@@ -13,6 +12,7 @@ fun main() {
 		val map = mutableMapOf<String, Int>()
 
 		val hKey: HKEYVar = alloc()
+		val data = "AMOGUS"
 		map["createKey1"] = RegCreateKeyExA(
 			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
 		)
@@ -25,7 +25,7 @@ fun main() {
 		println(szBuf.toKString())
 
 		val hKeyRe: HKEYVar = alloc()
-		val replace = "ABOBUS"
+		val replace = "SUS"
 		map["openKey2"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
 		map["setValue2"] = RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
 		map["closeKey2"] = RegCloseKey(hKeyRe.value)
