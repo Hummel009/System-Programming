@@ -8,6 +8,8 @@ fun main() {
 		val szBuf = allocArray<CHARVar>(MAX_PATH)
 		val dwBufLen = allocArray<DWORDVar>(1)
 		dwBufLen[0] = MAX_PATH.toUInt()
+		val dwFlag = allocArray<DWORDVar>(1)
+		dwFlag[0] = 0u
 
 		val log = mutableMapOf<String, Int>()
 
@@ -28,16 +30,13 @@ fun main() {
 		log["Set New Value"] = RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
 		log["Close Key Again"] = RegCloseKey(hKeyRe.value)
 		log["Get New Value"] = RegGetValueA(
-			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
+			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), dwFlag, szBuf, dwBufLen
 		)
 
 		println(szBuf.toKString())
+		println("Flag: ${dwFlag[0]}")
 
 		log["Delete Key"] = RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
-
-		//RegGetKeySecurity
-		//RegNotifyChangeKeyValue
-		//RegSetKeySecurity
 
 		log.forEach { (key, value) -> println("$key: ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
 	}
