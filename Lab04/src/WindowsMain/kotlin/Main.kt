@@ -4,58 +4,44 @@ import platform.windows.*
 fun main() {
 	memScoped {
 		val data = "AMOGUS"
+		val replacement = "SUS"
 		val name = "Hummel009"
 		val path = "Software\\RegistrySample\\"
 
 		val hKey: HKEYVar = alloc()
 
-		if (RegCreateKeyExA(
-				HKEY_CURRENT_USER,
-				path,
-				0u,
-				null,
-				REG_OPTION_VOLATILE.toUInt(),
-				KEY_WRITE.toUInt(),
-				null,
-				hKey.ptr,
-				null
-			) != ERROR_SUCCESS
-		) {
-			println("При создании ключа произошла ошибка")
-			return
-		}
+		val map = mutableMapOf<String, Int>()
 
-		if (RegSetValueExA(
-				hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf()
-			) != ERROR_SUCCESS
-		) {
-			println("При записи строки произошла ошибка")
-			return
-		}
-
-		if (RegCloseKey(hKey.value) != ERROR_SUCCESS) {
-			println("При закрытии ключа произошла ошибка")
-			return
-		}
-
-		if (RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, REG_SZ.toUInt(), hKey.ptr) != ERROR_SUCCESS) {
-			println("При открытии ключа произошла ошибка")
-			return
-		}
+		map["createKey1"] = RegCreateKeyExA(
+			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
+		)
+		map["setValue1"] = RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
+		map["closeKey1"] = RegCloseKey(hKey.value)
 
 		val szBuf = allocArray<CHARVar>(MAX_PATH)
 		val dwBufLen = allocArray<DWORDVar>(1)
 		dwBufLen[0] = MAX_PATH.toUInt()
 
-		if (RegGetValueA(
-				HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
-			) != ERROR_SUCCESS
-		) {
-			println("При чтении строки произошла ошибка")
-			return
-		}
+		map["getValue1"] = RegGetValueA(
+			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
+		)
 
 		println(szBuf.toKString())
+
+		val hKeyReopened: HKEYVar = alloc()
+
+		map["openKey2"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, REG_SZ.toUInt(), hKeyReopened.ptr)
+		map["setValue2"] = RegSetValueExA(
+			hKeyReopened.value, name, 0u, REG_SZ.toUInt(), replacement.ptr(), replacement.sizeOf()
+		)
+		map["closeKey2"] = RegCloseKey(hKeyReopened.value)
+		map["getValue2"] = RegGetValueA(
+			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
+		)
+
+		println(szBuf.toKString())
+
+		map.forEach { (key, value) -> println("$key, ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
 	}
 }
 
