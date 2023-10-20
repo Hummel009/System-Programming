@@ -1,0 +1,25 @@
+plugins {
+	id 'org.jetbrains.kotlin.multiplatform' version '1.8.22'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+	mavenCentral()
+}
+
+kotlin {
+	mingwX64('Windows').with {
+		binaries {
+			executable {
+				entryPoint = 'main'
+			}
+		}
+	}
+	sourceSets {
+		WindowsMain {
+
+		}
+	}
+}
