@@ -3,15 +3,15 @@ import platform.windows.*
 
 fun main() {
 	memScoped {
-		val szTestString = "This is the test"
-		val szPath = "Software\\RegistrySample\\"
+		val data = "AMOGUS"
+		val name = "Hummel009"
+		val path = "Software\\RegistrySample\\"
 
 		val hKey: HKEYVar = alloc()
 
-		// Создаем ключ в ветке HKEY_CURRENT_USER
-		if (RegCreateKeyExW(
+		if (RegCreateKeyExA(
 				HKEY_CURRENT_USER,
-				szPath,
+				path,
 				0u,
 				null,
 				REG_OPTION_VOLATILE.toUInt(),
@@ -25,14 +25,8 @@ fun main() {
 			return
 		}
 
-		// Пишем тестовую строку в созданный ключ
-		if (RegSetValueExW(
-				hKey.value,
-				"Test string",
-				0u,
-				REG_SZ.toUInt(),
-				szTestString.ptr(),
-				szTestString.sizeOf()
+		if (RegSetValueExA(
+				hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf()
 			) != ERROR_SUCCESS
 		) {
 			println("При записи строки произошла ошибка")
@@ -44,18 +38,17 @@ fun main() {
 			return
 		}
 
+		if (RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, REG_SZ.toUInt(), hKey.ptr) != ERROR_SUCCESS) {
+			println("При открытии ключа произошла ошибка")
+			return
+		}
+
 		val szBuf = allocArray<CHARVar>(MAX_PATH)
 		val dwBufLen = allocArray<DWORDVar>(1)
 		dwBufLen[0] = MAX_PATH.toUInt()
 
-		if (RegGetValueW(
-				HKEY_CURRENT_USER,
-				szPath,
-				"Test String",
-				RRF_RT_REG_SZ.toUInt(),
-				null,
-				szBuf,
-				dwBufLen
+		if (RegGetValueA(
+				HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
 			) != ERROR_SUCCESS
 		) {
 			println("При чтении строки произошла ошибка")
