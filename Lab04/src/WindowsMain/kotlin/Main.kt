@@ -9,39 +9,37 @@ fun main() {
 		val dwBufLen = allocArray<DWORDVar>(1)
 		dwBufLen[0] = MAX_PATH.toUInt()
 
-		val map = mutableMapOf<String, Int>()
+		val log = mutableMapOf<String, Int>()
 
 		val hKey: HKEYVar = alloc()
 		val data = "AMOGUS"
-		map["createKey1"] = RegCreateKeyExA(
+		log["Create Key"] = RegCreateKeyExA(
 			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
 		)
-		map["setValue1"] = RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
-		map["closeKey1"] = RegCloseKey(hKey.value)
-		map["getValue1"] = RegGetValueA(
-			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
-		)
+		log["Set Value"] = RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
+		log["Close Key"] = RegCloseKey(hKey.value)
+		log["Get Value"] = RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen)
 
 		println(szBuf.toKString())
 
 		val hKeyRe: HKEYVar = alloc()
 		val replace = "SUS"
-		map["openKey2"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
-		map["setValue2"] = RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
-		map["closeKey2"] = RegCloseKey(hKeyRe.value)
-		map["getValue1"] = RegGetValueA(
+		log["Open Key Again"] = RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
+		log["Set New Value"] = RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
+		log["Close Key Again"] = RegCloseKey(hKeyRe.value)
+		log["Get New Value"] = RegGetValueA(
 			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen
 		)
 
 		println(szBuf.toKString())
 
-		map["deleteValue2"] = RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
+		log["Delete Key"] = RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
 
 		//RegGetKeySecurity
 		//RegNotifyChangeKeyValue
 		//RegSetKeySecurity
 
-		map.forEach { (key, value) -> println("$key, ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
+		log.forEach { (key, value) -> println("$key: ${if (value == ERROR_SUCCESS) "OK" else "NOT OK"}") }
 	}
 }
 
