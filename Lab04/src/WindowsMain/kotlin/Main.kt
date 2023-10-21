@@ -1,4 +1,7 @@
 import kotlinx.cinterop.*
+import platform.posix.pthread_create
+import platform.posix.pthread_join
+import platform.posix.pthread_tVar
 import platform.windows.*
 
 val log: MutableMap<String, String> = mutableMapOf()
@@ -13,7 +16,10 @@ fun main() {
 		val dwFlag = allocArray<DWORDVar>(1)
 		dwFlag[0] = 0u
 
-		val hKey: HKEYVar = alloc()
+		val thread = nativeHeap.alloc<pthread_tVar>()
+		pthread_create(thread.ptr, null, staticCFunction(::threadFunction), null)
+
+		val hKey = alloc<HKEYVar>()
 		val data = "AMOGUS"
 
 		"Create Key" to RegCreateKeyExA(
@@ -25,7 +31,7 @@ fun main() {
 
 		println(szBuf.toKString())
 
-		val hKeyRe: HKEYVar = alloc()
+		val hKeyRe = alloc<HKEYVar>()
 		val replace = "SUS"
 
 		"Open Key Again" to RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
@@ -39,7 +45,30 @@ fun main() {
 		"Delete Key" to RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
 
 		log.forEach { (key, value) -> println("$key: $value") }
+
+		pthread_join(thread.value, null)
+		nativeHeap.free(thread)
 	}
+}
+
+fun threadFunction(arg: COpaquePointer?): CPointer<*>? {
+	memScoped {
+		val hKey = alloc<HKEYVar>()
+
+		"Open Key For Monitoring" to RegOpenKeyExA(
+			HKEY_CURRENT_USER, "Software\\RegistrySample", 0u, KEY_NOTIFY.toUInt(), hKey.ptr
+		)
+
+		val hEvent = CreateEventA(null, 1, 0, null)
+
+		RegNotifyChangeKeyValue(hKey.value, 1, REG_NOTIFY_CHANGE_LAST_SET.toUInt(), hEvent, 1)
+
+		if (WaitForSingleObject(hEvent, INFINITE) == WAIT_OBJECT_0) {
+			println("CHANGED")
+		}
+		ResetEvent(hEvent)
+	}
+	return null
 }
 
 private infix fun String.to(signal: Int) {
