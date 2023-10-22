@@ -1,7 +1,6 @@
 import kotlinx.cinterop.*
-import platform.posix.pthread_create
-import platform.posix.pthread_join
-import platform.posix.pthread_tVar
+import platform.posix.*
+import platform.posix.open
 import platform.windows.*
 
 val log: MutableMap<String, String> = mutableMapOf()
@@ -26,8 +25,9 @@ fun main() {
 			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
 		)
 		"Set Value" to RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
-		DeleteFileA("registryBackup.reg")
-		"Save Key to File" to RegSaveKeyA(hKey.value, "registryBackup.reg", null)
+		val file = fopen("registryBackup.reg", "w")
+		fprintf(file, "%s\n", data)
+		fclose(file)
 		"Close Key" to RegCloseKey(hKey.value)
 		"Get Value" to RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen)
 
