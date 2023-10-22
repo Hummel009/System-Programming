@@ -26,6 +26,8 @@ fun main() {
 			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
 		)
 		"Set Value" to RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
+		DeleteFileA("registryBackup.reg")
+		"Save Key to File" to RegSaveKeyA(hKey.value, "registryBackup.reg", null)
 		"Close Key" to RegCloseKey(hKey.value)
 		"Get Value" to RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen)
 
@@ -72,7 +74,7 @@ fun threadFunction(arg: COpaquePointer?): CPointer<*>? {
 }
 
 private infix fun String.to(signal: Int) {
-	log[this] = if (signal == ERROR_SUCCESS) "OK" else "NOT OK"
+	log[this] = if (signal == ERROR_SUCCESS) "OK" else signal.toString()
 }
 
 private fun String.sizeOf(): DWORD = encodeToByteArray().toUByteArray().size.toUInt()
