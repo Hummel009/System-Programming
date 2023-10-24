@@ -3,6 +3,8 @@ import platform.windows.*
 
 var NUM_BUFFERS: Int = 3
 
+val log: MutableMap<String, String> = mutableMapOf()
+
 fun main() {
 	memScoped {
 		val hWaveIn = alloc<HWAVEINVar>()
@@ -10,39 +12,30 @@ fun main() {
 
 		val wfx = alloc<WAVEFORMATEX>()
 
-		if (waveInOpen(
-				hWaveIn.ptr, WAVE_MAPPER, wfx.ptr, 0u, 0u, CALLBACK_FUNCTION.toUInt()
-			).toInt() != MMSYSERR_NOERROR
-		) {
-			return
-		}
+		"waveInOpen" to waveInOpen(
+			hWaveIn.ptr, WAVE_MAPPER, wfx.ptr, 0u, 0u, CALLBACK_FUNCTION.toUInt()
+		)
 
 		for (i in 0 until NUM_BUFFERS) {
-			if (waveInPrepareHeader(
-					hWaveIn.value, waveHeader[i].ptr, sizeOf<WAVEHDR>().toUInt()
-				).toInt() != MMSYSERR_NOERROR
-			) {
-				return
-			}
+			"waveInPrepareHeader" to waveInPrepareHeader(
+				hWaveIn.value, waveHeader[i].ptr, sizeOf<WAVEHDR>().toUInt()
+			)
 
-			if (waveInAddBuffer(
-					hWaveIn.value, waveHeader[i].ptr, sizeOf<WAVEHDR>().toUInt()
-				).toInt() != MMSYSERR_NOERROR
-			) {
-				return
-			}
+			"waveInAddBuffer" to waveInAddBuffer(
+				hWaveIn.value, waveHeader[i].ptr, sizeOf<WAVEHDR>().toUInt()
+			)
 		}
 
-		if (waveInStart(hWaveIn.value).toInt() != MMSYSERR_NOERROR) {
-			return
-		}
+		"waveInStart" to waveInStart(hWaveIn.value)
 
-		if (waveInStop(hWaveIn.value).toInt() != MMSYSERR_NOERROR) {
-			return
-		}
+		"waveInStop" to waveInStop(hWaveIn.value)
 
-		if (waveInClose(hWaveIn.value).toInt() != MMSYSERR_NOERROR) {
-			return
-		}
+		"waveInClose" to waveInClose(hWaveIn.value)
+
+		log.forEach { (key, value) -> println("$key: $value") }
 	}
+}
+
+private infix fun String.to(signal: UInt) {
+	log[this] = if (signal.toInt() == MMSYSERR_NOERROR) "OK" else signal.toString()
 }
