@@ -1,6 +1,5 @@
 import kotlinx.cinterop.*
 import platform.posix.*
-import platform.posix.open
 import platform.windows.*
 
 val log: MutableMap<String, String> = mutableMapOf()
