@@ -1,7 +1,6 @@
 import kotlinx.cinterop.*
 import platform.posix.*
 import platform.windows.*
-import kotlin.native.internal.collectReferenceFieldValues
 
 val log: MutableMap<String, String> = mutableMapOf()
 
