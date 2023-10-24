@@ -37,5 +37,5 @@ fun main() {
 }
 
 private infix fun String.to(signal: UInt) {
-	log[this] = if (signal.toInt() == MMSYSERR_NOERROR) "OK" else signal.toString()
+	log[this] = if (signal.toInt() == MMSYSERR_NOERROR) "OK" else "ERROR CODE: $signal"
 }
