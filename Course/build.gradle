@@ -1,46 +1,25 @@
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.8.22'
-	id 'application'
+	id 'org.jetbrains.kotlin.multiplatform' version '1.8.22'
 }
 
 group = 'org.example'
-final def currentDate = LocalDate.now()
-version = 'v' + currentDate.format(DateTimeFormatter.ofPattern('yy.MM.dd'))
+version = '1.0-SNAPSHOT'
 
 repositories {
 	mavenCentral()
 }
 
-configurations {
-	embed
-	compile.extendsFrom(embed)
-}
-
-dependencies {
-	embed 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
-	embed 'net.java.dev.jna:jna:5.13.0'
-	embed 'net.java.dev.jna:jna-platform:5.13.0'
-	implementation 'net.java.dev.jna:jna:5.13.0'
-	implementation 'net.java.dev.jna:jna-platform:5.13.0'
-}
-
 kotlin {
-	jvmToolchain(8)
-}
-
-application {
-	mainClassName = 'hummel.MainKt'
-}
-
-jar {
-	manifest {
-		attributes 'Main-Class': 'hummel.MainKt'
+	mingwX64('Windows').with {
+		binaries {
+			executable {
+				entryPoint = 'main'
+			}
+		}
 	}
-	from(configurations.embed.collect {
-		if (it.isDirectory()) it else zipTree(it)
-	})
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	sourceSets {
+		WindowsMain {
+
+		}
+	}
 }
