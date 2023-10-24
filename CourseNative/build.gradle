@@ -18,6 +18,7 @@ kotlin {
 		binaries {
 			executable {
 				entryPoint = 'hummel.main'
+				linkerOpts('-lwinmm')
 			}
 		}
 	}

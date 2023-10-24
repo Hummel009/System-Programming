@@ -1,3 +1,5 @@
+package hummel
+
 import kotlinx.cinterop.*
 import platform.posix.FILE
 import platform.posix.fclose
