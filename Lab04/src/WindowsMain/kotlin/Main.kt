@@ -1,6 +1,7 @@
 import kotlinx.cinterop.*
 import platform.posix.*
 import platform.windows.*
+import kotlin.native.internal.collectReferenceFieldValues
 
 val log: MutableMap<String, String> = mutableMapOf()
 
@@ -76,6 +77,6 @@ private infix fun String.to(signal: Int) {
 	log[this] = if (signal == ERROR_SUCCESS) "OK" else signal.toString()
 }
 
-private fun String.sizeOf(): DWORD = encodeToByteArray().toUByteArray().size.toUInt()
+private fun String.sizeOf(): DWORD = cstr.size.toUInt()
 
-private fun String.ptr(): CValuesRef<UByteVarOf<UByte>> = encodeToByteArray().toUByteArray().refTo(0)
+private fun String.ptr(): CValuesRef<UByteVarOf<UByte>> = cstr.getBytes().toUByteArray().refTo(0)
