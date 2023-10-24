@@ -1,6 +1,9 @@
 import kotlinx.cinterop.*
+import platform.posix.FILE
+import platform.posix.fclose
+import platform.posix.fopen
+import platform.posix.fwrite
 import platform.windows.*
-import platform.posix.*
 
 var NUM_BUFFERS: Int = 3
 
@@ -40,19 +43,22 @@ fun main() {
 
 		"waveInStart" to waveInStart(hWaveIn.value)
 
-		"waveInStop" to waveInStop(hWaveIn.value)
-
-		"waveInClose" to waveInClose(hWaveIn.value)
-
-		val wavFile = fopen("output.wav", "wb") ?: error("Cannot open output.wav for writing")
+		val wavFile = fopen("output.wav", "w") ?: error("Cannot open output.wav for writing")
 
 		writeWaveHeader(wavFile, wfx, NUM_BUFFERS)
 
 		for (i in 0 until NUM_BUFFERS) {
+			while ((waveHeader[i].dwFlags and WHDR_DONE.toUInt()) == 0u) {
+				Sleep(5000u)
+			}
 			fwrite(waveHeader[i].lpData, 1u, waveHeader[i].dwBufferLength.convert(), wavFile)
 		}
 
+		"waveInStop" to waveInStop(hWaveIn.value)
+
 		fclose(wavFile)
+
+		"waveInClose" to waveInClose(hWaveIn.value)
 
 		log.forEach { (key, value) -> println("$key: $value") }
 	}
@@ -67,18 +73,12 @@ fun writeWaveHeader(file: CPointer<FILE>, wfx: WAVEFORMATEX, numBuffers: Int) {
 	val dataSize = NUM_BUFFERS * sizeOf<WAVEHDR>()
 
 	fwrite("RIFF".cstr, 1u, 4u, file)
-	fwrite((headerSize + dataSize), 1u, 4u, file)
+	fwrite((headerSize + dataSize).toString().cstr, 1u, 4u, file)
 	fwrite("WAVEfmt ".cstr, 1u, 8u, file)
-	fwrite(16, 1u, 4u, file)
+	fwrite("16".cstr, 1u, 4u, file)
 
-	// Write the WAVEFORMATEX structure
 	fwrite(wfx.ptr, 1u, sizeOf<WAVEFORMATEX>().toULong(), file)
 
-	// Write the "data" chunk header
 	fwrite("data".cstr, 1u, 4u, file)
-	fwrite(dataSize, 1u, 4u, file)
-}
-
-fun UInt.toBytes(): ByteArray {
-	return ByteArray(4) { i -> (this shr (i * 8)).toByte() }
+	fwrite(dataSize.toString().cstr, 1u, 4u, file)
 }
