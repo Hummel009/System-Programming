@@ -1,0 +1,29 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+plugins {
+	id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+	id 'org.openjfx.javafxplugin' version '0.1.0'
+	id 'application'
+}
+
+group = 'org.example'
+final def currentDate = LocalDate.now()
+version = 'v' + currentDate.format(DateTimeFormatter.ofPattern('yy.MM.dd'))
+
+repositories {
+	mavenCentral()
+}
+
+kotlin {
+	jvmToolchain(11)
+}
+
+application {
+	mainClassName = 'hummel.MainKt'
+}
+
+javafx {
+	version = '17.0.6'
+	modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.media']
+}
