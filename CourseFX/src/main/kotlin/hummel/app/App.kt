@@ -4,19 +4,19 @@ import javafx.application.Application
 import javafx.stage.Stage
 
 class App : Application() {
-	private var windowSize: WindowSize? = null
-	private var player: Player? = null
+	private lateinit var windowSize: WindowSize
+	private lateinit var player: Player
 
 	override fun init() {
 		windowSize = WindowSize()
-		player = Player(windowSize ?: return)
+		player = Player(windowSize)
 	}
 
 	override fun start(stage: Stage) {
-		(windowSize ?: return).bind(stage.widthProperty(), stage.heightProperty())
-		(player ?: return).stage = stage
+		windowSize.bind(stage.widthProperty(), stage.heightProperty())
+		player.stage = stage
 		stage.title = "Hummel009's Media Player"
-		stage.setScene((player ?: return).scene)
+		stage.setScene(player.scene)
 		stage.show()
 	}
 }

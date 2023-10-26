@@ -20,10 +20,17 @@ class Visualization(windowSize: WindowSize) : Group() {
 	private var lazyHeights: FloatArray
 	private var offsetter: FloatArray
 	private var length: Int = 256
-	private var width: Float
+	private var width: Float = 4f
 	private var rootHeight: Float
 	private var centerX: Float
-	private var controls: FloatArray
+	private var controls: FloatArray = floatArrayOf(
+		-60.0f,  // threshold
+		2.0f,    // acceleration
+		1.5f,    // height
+		2.0f,    // bloom
+		86.0f,   // magnitude
+		0.0f     // color offset
+	)
 
 	init {
 		canvas.width = 2560.0
@@ -36,7 +43,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 		offsetter = offsettingMap(length)
 		heights = FloatArray(length)
 		lazyHeights = FloatArray(length)
-		width = 4f
 		rootHeight = 0.5f * canvas.height.toFloat()
 		centerX = 0.5f * canvas.width.toFloat()
 		controls = FloatArray(6)
@@ -55,7 +61,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 		if (!isVisible) {
 			return
 		}
-		updateControls()
 		bloom.threshold = controls[3].toDouble()
 		val heightMult = (controls[2] / 2).toDouble()
 		gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
@@ -83,11 +88,8 @@ class Visualization(windowSize: WindowSize) : Group() {
 	}
 
 	private fun normalized(f: Float): Float {
-		var n = f / 100
-		if (n > 0.99f) {
-			n = 0.99f
-		}
-		return n
+		val n = f / 100f
+		return if (n > 0.99f) 0.99f else n
 	}
 
 	private fun height(magnitude: Float): Float {
@@ -96,8 +98,11 @@ class Visualization(windowSize: WindowSize) : Group() {
 	}
 
 	private fun avg(array: FloatArray): Double {
-		return IntStream.range(0, array.size).mapToDouble { i: Int -> array[i].toDouble() }.parallel()
-			.reduce(0.0) { a: Double, b: Double -> sum(a, b) } / array.size
+		return IntStream.range(0, array.size).mapToDouble { i: Int ->
+			array[i].toDouble()
+		}.parallel().reduce(0.0) { a: Double, b: Double ->
+			sum(a, b)
+		} / array.size
 	}
 
 	private fun offsettingMap(length: Int): FloatArray {
@@ -106,14 +111,5 @@ class Visualization(windowSize: WindowSize) : Group() {
 			map[i] = i * ((i - 128).toDouble().pow(2.0).toFloat() / 10000.0f + 1)
 		}
 		return map
-	}
-
-	private fun updateControls() {
-		controls[0] = -60.0f // threshold;
-		controls[1] = 2.0f // acceleration
-		controls[2] = 1.5f // height
-		controls[3] = 2.0f // bloom
-		controls[4] = 86.0f // magnitude
-		controls[5] = 0.0f // color offset
 	}
 }
