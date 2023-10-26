@@ -45,7 +45,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 		lazyHeights = FloatArray(length)
 		rootHeight = 0.5f * canvas.height.toFloat()
 		centerX = 0.5f * canvas.width.toFloat()
-		controls = FloatArray(6)
 		reflection = Reflection()
 		reflection.topOffset = -canvas.height
 		reflection.topOpacity = 1.0
