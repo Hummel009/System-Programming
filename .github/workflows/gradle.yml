@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: compiled-artifactc
-          path: ./CourseNative/build/bin/native/releaseExecutable/*.jar
+          path: ./CourseNative/build/bin/native/releaseExecutable/*.exe
           
   buildcfx:
     runs-on: windows-latest
