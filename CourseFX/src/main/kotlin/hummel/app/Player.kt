@@ -1,6 +1,7 @@
 package hummel.app
 
-import hummel.engine.Visualizer
+import hummel.engine.DynamicSetting
+import hummel.engine.Visualization
 import hummel.file
 import javafx.event.Event
 import javafx.event.EventHandler
@@ -14,17 +15,26 @@ import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import java.net.MalformedURLException
+import java.util.function.Consumer
 
 class Player(private var windowSize: WindowSize) {
+	private var mediaPlayer: MediaPlayer? = null
+	private var player: Player? = null
 	private var borderPane: BorderPane = BorderPane()
 	private var stackPane: StackPane = StackPane(borderPane)
-	private var player: Player? = null
-	private var visualizer: Visualizer? = null
-	private var mediaPlayer: MediaPlayer? = null
+	private var pane: Pane = Pane()
+	private var visualization: Visualization = Visualization(windowSize)
+	private var dynamicSettings: Array<DynamicSetting> = arrayOf(
+		DynamicSetting(1, 5, 50), DynamicSetting(7, 24, 40), DynamicSetting(30, 60, 30)
+	)
 	var stage: Stage? = null
 	var scene: Scene
 
 	init {
+		pane.background = Background(BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))
+		pane.viewOrder = 10.0
+		pane.children.add(visualization)
+
 		stackPane.alignment = Pos.CENTER
 		stackPane.background = Background(BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))
 		scene = Scene(stackPane, 1280.0, 720.0)
@@ -32,25 +42,36 @@ class Player(private var windowSize: WindowSize) {
 			try {
 				val media = Media(file.toURI().toURL().toString())
 				mediaPlayer = MediaPlayer(media)
-				(mediaPlayer ?: return@EventHandler).onEndOfMedia = Runnable {
-					player = null
-					(visualizer ?: return@Runnable).clear()
-					visualizer = null
-				}
-				if (player == null) {
-					player = Player(windowSize)
-					visualizer = Visualizer(windowSize)
-					(mediaPlayer ?: return@EventHandler).audioSpectrumNumBands = 1024
-					(mediaPlayer ?: return@EventHandler).audioSpectrumListener =
-						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
-							(visualizer ?: return@AudioSpectrumListener).createListener().accept(floats)
+				mediaPlayer?.let { mp ->
+					mp.onEndOfMedia = Runnable {
+						player?.pane?.children?.clear()
+						player = null
+					}
+					if (player == null) {
+						player = Player(windowSize)
+						player?.let { p ->
+							mp.audioSpectrumNumBands = 1024
+							mp.audioSpectrumListener =
+								AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
+									p.createListener().accept(floats)
+								}
+							stackPane.children.add(p.pane)
+							mp.play()
 						}
-					stackPane.children.add((visualizer ?: return@EventHandler).pane)
-					(mediaPlayer ?: return@EventHandler).play()
+					}
 				}
 			} catch (e: MalformedURLException) {
 				e.printStackTrace()
 			}
+		}
+	}
+
+	private fun createListener(): Consumer<FloatArray> {
+		return Consumer {
+			for (setting in dynamicSettings) {
+				setting.update(it)
+			}
+			visualization.update(it)
 		}
 	}
 }
