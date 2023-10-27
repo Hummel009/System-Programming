@@ -64,7 +64,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
-          name: compiled-artifactc
+          name: compiled-artifactcn
           path: ./CourseNative/build/bin/native/releaseExecutable/*.exe
           
   buildcfx:
@@ -84,5 +84,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
-          name: compiled-artifactc
+          name: compiled-artifactcfx
           path: ./CourseFX/build/libs/*.jar
