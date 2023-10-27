@@ -21,4 +21,9 @@ kotlin {
 			}
 		}
 	}
+	sourceSets {
+		configureEach {
+			languageSettings.optIn('kotlinx.cinterop.ExperimentalForeignApi')
+		}
+	}
 }

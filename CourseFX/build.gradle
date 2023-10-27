@@ -21,7 +21,7 @@ dependencies {
 }
 
 kotlin {
-	jvmToolchain(11)
+	jvmToolchain(17)
 }
 
 application {
@@ -29,7 +29,7 @@ application {
 }
 
 javafx {
-	version = '17.0.6'
+	version = '22-ea+11'
 	modules = ['javafx.media']
 }
 
