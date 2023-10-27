@@ -15,6 +15,11 @@ repositories {
 	mavenCentral()
 }
 
+dependencies {
+	implementation 'com.formdev:flatlaf:3.2.1'
+	implementation 'com.formdev:flatlaf-intellij-themes:3.2.1'
+}
+
 kotlin {
 	jvmToolchain(11)
 }
@@ -25,5 +30,17 @@ application {
 
 javafx {
 	version = '17.0.6'
-	modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.media']
+	modules = ['javafx.media']
+}
+
+jar {
+	manifest {
+		attributes('Main-Class': 'hummel.MainKt')
+	}
+	from {
+		configurations.runtimeClasspath.collect {
+			if (it.isDirectory()) it else zipTree(it)
+		}
+	}
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
