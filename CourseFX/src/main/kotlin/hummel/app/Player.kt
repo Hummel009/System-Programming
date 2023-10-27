@@ -17,23 +17,19 @@ import javafx.stage.Stage
 import java.net.MalformedURLException
 import java.util.function.Consumer
 
-class Player(private var windowSize: WindowSize) {
+class Player(windowSize: WindowSize) {
 	private var mediaPlayer: MediaPlayer? = null
-	private var borderPane: BorderPane = BorderPane()
-	private var stackPane: StackPane = StackPane(borderPane)
-	private var pane: Pane = Pane()
 	private var visualization: Visualization = Visualization(windowSize)
-	private var dynamicSettings: Array<DynamicSetting> = arrayOf(
-		DynamicSetting(1, 5, 50), DynamicSetting(7, 24, 40), DynamicSetting(30, 60, 30)
-	)
 	var stage: Stage? = null
 	var scene: Scene
 
 	init {
+		val pane = Pane()
 		pane.background = Background(BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))
 		pane.viewOrder = 10.0
-		pane.children.add(visualization)
 
+		val borderPane = BorderPane()
+		val stackPane = StackPane(borderPane)
 		stackPane.alignment = Pos.CENTER
 		stackPane.background = Background(BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))
 		scene = Scene(stackPane, 1280.0, 720.0)
@@ -42,16 +38,18 @@ class Player(private var windowSize: WindowSize) {
 				val media = Media(file.toURI().toURL().toString())
 				mediaPlayer = MediaPlayer(media)
 				mediaPlayer?.let { mp ->
-					mp.onEndOfMedia = Runnable {
-						pane.children?.clear()
-					}
 					mp.audioSpectrumNumBands = 1024
 					mp.audioSpectrumListener =
 						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
 							createListener().accept(floats)
 						}
+					pane.children.add(visualization)
 					stackPane.children.add(pane)
 					mp.play()
+					mp.onEndOfMedia = Runnable {
+						pane.children.clear()
+						stackPane.children.clear()
+					}
 				}
 			} catch (e: MalformedURLException) {
 				e.printStackTrace()
@@ -60,6 +58,9 @@ class Player(private var windowSize: WindowSize) {
 	}
 
 	private fun createListener(): Consumer<FloatArray> {
+		val dynamicSettings = arrayOf(
+			DynamicSetting(1, 5, 50), DynamicSetting(7, 24, 40), DynamicSetting(30, 60, 30)
+		)
 		return Consumer {
 			for (setting in dynamicSettings) {
 				setting.update(it)
