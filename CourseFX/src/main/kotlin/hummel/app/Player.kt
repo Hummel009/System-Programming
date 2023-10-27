@@ -20,6 +20,7 @@ import java.util.function.Consumer
 class Player(windowSize: WindowSize) {
 	private var mediaPlayer: MediaPlayer? = null
 	private var visualization: Visualization = Visualization(windowSize)
+	private var playing: Boolean = false
 	var stage: Stage? = null
 	var scene: Scene
 
@@ -43,12 +44,17 @@ class Player(windowSize: WindowSize) {
 						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
 							createListener().accept(floats)
 						}
-					pane.children.add(visualization)
-					stackPane.children.add(pane)
-					mp.play()
+					if (!playing) {
+						pane.children.add(visualization)
+						stackPane.children.add(pane)
+						mp.play()
+						playing = true
+					}
 					mp.onEndOfMedia = Runnable {
 						pane.children.clear()
 						stackPane.children.clear()
+						mediaPlayer = null
+						playing = false
 					}
 				}
 			} catch (e: MalformedURLException) {
