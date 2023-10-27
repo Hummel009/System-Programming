@@ -2,7 +2,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.10'
 	id 'org.openjfx.javafxplugin' version '0.1.0'
 	id 'application'
 }
