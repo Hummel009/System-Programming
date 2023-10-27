@@ -19,7 +19,6 @@ import java.util.function.Consumer
 
 class Player(private var windowSize: WindowSize) {
 	private var mediaPlayer: MediaPlayer? = null
-	private var player: Player? = null
 	private var borderPane: BorderPane = BorderPane()
 	private var stackPane: StackPane = StackPane(borderPane)
 	private var pane: Pane = Pane()
@@ -44,21 +43,15 @@ class Player(private var windowSize: WindowSize) {
 				mediaPlayer = MediaPlayer(media)
 				mediaPlayer?.let { mp ->
 					mp.onEndOfMedia = Runnable {
-						player?.pane?.children?.clear()
-						player = null
+						pane.children?.clear()
 					}
-					if (player == null) {
-						player = Player(windowSize)
-						player?.let { p ->
-							mp.audioSpectrumNumBands = 1024
-							mp.audioSpectrumListener =
-								AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
-									p.createListener().accept(floats)
-								}
-							stackPane.children.add(p.pane)
-							mp.play()
+					mp.audioSpectrumNumBands = 1024
+					mp.audioSpectrumListener =
+						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
+							createListener().accept(floats)
 						}
-					}
+					stackPane.children.add(pane)
+					mp.play()
 				}
 			} catch (e: MalformedURLException) {
 				e.printStackTrace()
