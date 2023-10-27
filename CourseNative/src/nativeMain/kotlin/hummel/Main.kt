@@ -9,7 +9,13 @@ import platform.windows.*
 
 val log: MutableMap<String, String> = mutableMapOf()
 
-fun main() {
+fun main(args: Array<String>) {
+	require(args.size == 2) {
+		"Invalid arguments quantity"
+	}
+	val seconds = args[0].toUInt()
+	val path = args[1]
+
 	memScoped {
 		val devices = waveInGetNumDevs()
 		println("There are $devices microphones.")
@@ -39,20 +45,19 @@ fun main() {
 
 		println("Recording started!")
 
-		Sleep(5000u)
+		Sleep(seconds)
 
 		"waveInStop" to waveInStop(hwi.value)
 		"waveInClose" to waveInClose(hwi.value)
 
-		val wavFileName = "output.wav"
-		val outputFile = fopen(wavFileName, "w")
+		val outputFile = fopen(path, "w")
 
 		outputFile?.let {
 			writeWavHeader(outputFile, wfx.nChannels, wfx.nSamplesPerSec, wfx.wBitsPerSample, wh.dwBytesRecorded)
 			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), outputFile)
 			fclose(outputFile)
 		} ?: {
-			println("Error opening file $wavFileName")
+			println("Error opening file $path")
 		}
 
 		log.forEach { (key, value) -> println("$key: $value") }
