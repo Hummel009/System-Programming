@@ -42,7 +42,7 @@ class GUI : JFrame() {
 
 		inputPanel.add(JLabel("Длина записи:"))
 		val timeField = JTextField(20)
-		timeField.text = "10"
+		timeField.text = "5000"
 		inputPanel.add(timeField)
 
 		inputPanel.add(JLabel("Выбор файла:"))
@@ -58,7 +58,10 @@ class GUI : JFrame() {
 
 			val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
 			val process = processBuilder.start()
-			process.waitFor()
+			val exitCode = process.waitFor()
+			JOptionPane.showMessageDialog(
+				this, "Код завершения: $exitCode", "Message", JOptionPane.INFORMATION_MESSAGE
+			)
 		}
 
 		val visButton = JButton("Запуск визуализации")
