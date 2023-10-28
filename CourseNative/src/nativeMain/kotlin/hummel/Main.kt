@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
 	require(args.size == 2) {
 		"Invalid arguments quantity"
 	}
-	val seconds = args[0].toUInt()
+	val seconds = args[0].toUInt() * 1000u
 	val path = args[1]
 
 	memScoped {
