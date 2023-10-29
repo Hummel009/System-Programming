@@ -40,9 +40,9 @@ class GUI : JFrame() {
 		val inputPanel = JPanel()
 		inputPanel.layout = GridLayout(0, 2, 5, 5)
 
-		inputPanel.add(JLabel("Длина записи:"))
+		inputPanel.add(JLabel("Длина записи (секунд):"))
 		val timeField = JTextField(20)
-		timeField.text = "5000"
+		timeField.text = "5"
 		inputPanel.add(timeField)
 
 		inputPanel.add(JLabel("Выбор файла:"))
