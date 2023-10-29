@@ -50,12 +50,12 @@ fun main(args: Array<String>) {
 		"waveInStop" to waveInStop(hwi.value)
 		"waveInClose" to waveInClose(hwi.value)
 
-		val outputFile = fopen(path, "w")
+		val outputFile = fopen(path, "wb")
 
 		outputFile?.let {
-			writeWavHeader(outputFile, wfx.nChannels, wfx.nSamplesPerSec, wfx.wBitsPerSample, wh.dwBytesRecorded)
-			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), outputFile)
-			fclose(outputFile)
+			writeWavHeader(it, wfx.nChannels, wfx.nSamplesPerSec, wfx.wBitsPerSample, wh.dwBytesRecorded)
+			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), it)
+			fclose(it)
 		} ?: {
 			println("Error opening file $path")
 		}
