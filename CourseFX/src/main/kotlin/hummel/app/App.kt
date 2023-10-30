@@ -15,7 +15,6 @@ class App : Application() {
 
 	override fun start(stage: Stage) {
 		windowSize.bind(stage.widthProperty(), stage.heightProperty())
-		player.stage = stage
 		stage.title = "Hummel009's Media Player"
 		stage.setScene(player.scene)
 		stage.show()

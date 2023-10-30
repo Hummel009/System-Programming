@@ -21,7 +21,6 @@ class Player(windowSize: WindowSize) {
 	private var mediaPlayer: MediaPlayer? = null
 	private var visualization: Visualization = Visualization(windowSize)
 	private var playing: Boolean = false
-	var stage: Stage? = null
 	var scene: Scene
 
 	init {
