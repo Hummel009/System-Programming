@@ -27,6 +27,20 @@ private fun List<String>.chunk(executors: Int): List<List<String>> {
 }
 
 private fun List<String>.mergeSort(): List<String> {
+	fun mergeStrings(left: List<String>, right: List<String>): List<String> {
+		return sequence {
+			var leftIndex = 0
+			var rightIndex = 0
+
+			while (leftIndex < left.size && rightIndex < right.size) {
+				yield(if (left[leftIndex] < right[rightIndex]) left[leftIndex++] else right[rightIndex++])
+			}
+
+			yieldAll(left.subList(leftIndex, left.size))
+			yieldAll(right.subList(rightIndex, right.size))
+		}.toList()
+	}
+
 	return if (size <= 1) this else {
 		val middle = size / 2
 		val (left, right) = subList(0, middle) to subList(middle, size)
@@ -34,16 +48,3 @@ private fun List<String>.mergeSort(): List<String> {
 	}
 }
 
-private fun mergeStrings(left: List<String>, right: List<String>): List<String> {
-	return sequence {
-		var leftIndex = 0
-		var rightIndex = 0
-
-		while (leftIndex < left.size && rightIndex < right.size) {
-			yield(if (left[leftIndex] < right[rightIndex]) left[leftIndex++] else right[rightIndex++])
-		}
-
-		yieldAll(left.subList(leftIndex, left.size))
-		yieldAll(right.subList(rightIndex, right.size))
-	}.toList()
-}
