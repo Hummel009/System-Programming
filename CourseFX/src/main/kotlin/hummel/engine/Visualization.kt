@@ -4,11 +4,12 @@ import hummel.app.WindowSize
 import javafx.scene.Group
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.control.Label
 import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
-import java.lang.Double.sum
-import java.util.stream.IntStream
+import javafx.scene.text.Font
+import javafx.scene.text.TextAlignment
 import kotlin.math.pow
 
 class Visualization(windowSize: WindowSize) : Group() {
@@ -23,6 +24,7 @@ class Visualization(windowSize: WindowSize) : Group() {
 	private var width: Float = 4f
 	private var rootHeight: Float
 	private var centerX: Float
+	private var bottomText: Label
 	private var controls: FloatArray = floatArrayOf(
 		-60.0f,  // threshold
 		2.0f,    // acceleration
@@ -54,6 +56,12 @@ class Visualization(windowSize: WindowSize) : Group() {
 		canvas.translateXProperty().bind(windowSize.width.subtract(canvas.width).divide(2))
 		canvas.translateYProperty().bind(windowSize.height.subtract(canvas.height).divide(2))
 		children.add(canvas)
+		bottomText = Label("Ваш белый текст здесь")
+		bottomText.textFill = Color.WHITE
+		bottomText.font = Font("Arial", 20.0)
+		bottomText.textAlignment = TextAlignment.CENTER
+		bottomText.layoutXProperty().bind(windowSize.width.subtract(bottomText.width).divide(2))
+		children.add(bottomText)
 	}
 
 	fun update(magnitudes: FloatArray) {
@@ -63,7 +71,7 @@ class Visualization(windowSize: WindowSize) : Group() {
 		bloom.threshold = controls[3].toDouble()
 		val heightMult = (controls[2] / 2).toDouble()
 		gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-		val avg = normalized(avg(magnitudes.copyOf(length)).toFloat())
+		val avg = normalized((magnitudes.copyOf(length).average()).toFloat())
 		gc.stroke = Color.hsb((avg * controls[4] + controls[5]).toDouble(), 1.0, 1.0)
 		gc.lineWidth = (avg * 6).toDouble()
 		gc.beginPath()
@@ -86,29 +94,13 @@ class Visualization(windowSize: WindowSize) : Group() {
 		gc.closePath()
 	}
 
-	private fun normalized(f: Float): Float {
-		val n = f / 100f
-		return if (n > 0.99f) 0.99f else n
-	}
+	private fun normalized(f: Float): Float = (f / 100f).coerceIn(0.0f, 0.99f)
 
 	private fun height(magnitude: Float): Float {
-		val f = (magnitude + 90).toDouble().pow(2.3).toFloat() / 40
-		return if (f > 0) f else 0f
-	}
-
-	private fun avg(array: FloatArray): Double {
-		return IntStream.range(0, array.size).mapToDouble { i: Int ->
-			array[i].toDouble()
-		}.parallel().reduce(0.0) { a: Double, b: Double ->
-			sum(a, b)
-		} / array.size
+		return ((magnitude + 90).toDouble().pow(2.3).toFloat() / 40).coerceAtLeast(0f)
 	}
 
 	private fun offsettingMap(length: Int): FloatArray {
-		val map = FloatArray(length)
-		for (i in 0 until length) {
-			map[i] = i * ((i - 128).toDouble().pow(2.0).toFloat() / 10000.0f + 1)
-		}
-		return map
+		return FloatArray(length) { i -> (i * ((i - 128).toDouble().pow(2.0).toFloat() / 10000.0f + 1)) }
 	}
 }
