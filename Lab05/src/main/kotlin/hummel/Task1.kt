@@ -19,6 +19,5 @@ fun main() {
 		val task = queue.poll()
 		print("Выполняю ")
 		task.invoke()
-		Thread.sleep(500)
 	}
 }

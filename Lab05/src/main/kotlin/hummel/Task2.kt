@@ -28,7 +28,6 @@ fun main() {
 				val task = queue.poll()
 				print("Поток $exe: выполняю ")
 				task.invoke()
-				Thread.sleep(500)
 			}
 		}.join()
 	}
