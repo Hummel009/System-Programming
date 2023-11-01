@@ -1,7 +1,5 @@
 package hummel.app
 
-import hummel.engine.DynamicSetting
-import hummel.engine.Visualization
 import hummel.file
 import javafx.event.Event
 import javafx.event.EventHandler
@@ -13,7 +11,6 @@ import javafx.scene.media.AudioSpectrumListener
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
-import javafx.stage.Stage
 import java.net.MalformedURLException
 import java.util.function.Consumer
 
@@ -41,7 +38,7 @@ class Player(windowSize: WindowSize) {
 					mp.audioSpectrumNumBands = 1024
 					mp.audioSpectrumListener =
 						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
-							createListener().accept(floats)
+							Consumer<FloatArray> { visualization.update(it) }.accept(floats)
 						}
 					if (!playing) {
 						pane.children.add(visualization)
@@ -59,18 +56,6 @@ class Player(windowSize: WindowSize) {
 			} catch (e: MalformedURLException) {
 				e.printStackTrace()
 			}
-		}
-	}
-
-	private fun createListener(): Consumer<FloatArray> {
-		val dynamicSettings = arrayOf(
-			DynamicSetting(1, 5, 50), DynamicSetting(7, 24, 40), DynamicSetting(30, 60, 30)
-		)
-		return Consumer {
-			for (setting in dynamicSettings) {
-				setting.update(it)
-			}
-			visualization.update(it)
 		}
 	}
 }

@@ -1,6 +1,5 @@
-package hummel.engine
+package hummel.app
 
-import hummel.app.WindowSize
 import javafx.scene.Group
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -9,7 +8,6 @@ import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
-import javafx.scene.text.TextAlignment
 import kotlin.math.pow
 
 class Visualization(windowSize: WindowSize) : Group() {
@@ -56,11 +54,12 @@ class Visualization(windowSize: WindowSize) : Group() {
 		canvas.translateXProperty().bind(windowSize.width.subtract(canvas.width).divide(2))
 		canvas.translateYProperty().bind(windowSize.height.subtract(canvas.height).divide(2))
 		children.add(canvas)
-		bottomText = Label("Ваш белый текст здесь")
+
+		bottomText = Label("0")
 		bottomText.textFill = Color.WHITE
 		bottomText.font = Font("Arial", 20.0)
-		bottomText.textAlignment = TextAlignment.CENTER
-		bottomText.layoutXProperty().bind(windowSize.width.subtract(bottomText.width).divide(2))
+		val center = windowSize.width.divide(2)
+		bottomText.layoutXProperty().bind(center)
 		children.add(bottomText)
 	}
 
