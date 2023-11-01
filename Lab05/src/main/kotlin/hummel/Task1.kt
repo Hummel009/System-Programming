@@ -1,35 +1,24 @@
 package hummel
 
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.concurrent.thread
 
 fun main() {
-	val taskQueue = ConcurrentLinkedQueue<Runnable>()
+	val queue = ConcurrentLinkedQueue<() -> Unit>()
 
-	val insertThread1 = Thread {
-		for (i in 1..5) {
-			val task = { println("задание $i из потока 1") }
-			taskQueue.add(task)
-		}
+	val threads = mutableListOf<Thread>()
+	repeat(10) {
+		threads.add(thread {
+			queue.add { println("задание из потока $it") }
+		})
 	}
 
-	val insertThread2 = Thread {
-		for (i in 6..10) {
-			val task = { println("задание $i из потока 2") }
-			taskQueue.add(task)
-		}
-	}
+	threads.forEach { it.join() }
 
-	insertThread1.start()
-	insertThread2.start()
-	insertThread1.join()
-	insertThread2.join()
-
-	while (!taskQueue.isEmpty()) {
-		val task = taskQueue.poll()
-		task?.let {
-			print("Выполняю ")
-			it.run()
-			Thread.sleep(500)
-		}
+	while (!queue.isEmpty()) {
+		val task = queue.poll()
+		print("Выполняю ")
+		task.invoke()
+		Thread.sleep(500)
 	}
 }
