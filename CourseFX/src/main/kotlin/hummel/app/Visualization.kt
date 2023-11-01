@@ -55,7 +55,7 @@ class Visualization(windowSize: WindowSize) : Group() {
 		canvas.translateYProperty().bind(windowSize.height.subtract(canvas.height).divide(2))
 		children.add(canvas)
 
-		bottomText = Label("0")
+		bottomText = Label(offsetter[200].toString())
 		bottomText.textFill = Color.WHITE
 		bottomText.font = Font("Arial", 20.0)
 		val center = windowSize.width.divide(2)
@@ -70,7 +70,7 @@ class Visualization(windowSize: WindowSize) : Group() {
 		bloom.threshold = controls[3].toDouble()
 		val heightMult = (controls[2] / 2).toDouble()
 		gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-		val avg = normalized((magnitudes.copyOf(length).average()).toFloat())
+		val avg = ((magnitudes.copyOf(length).average()).toFloat() / 100f).coerceIn(0.0f, 0.99f)
 		gc.stroke = Color.hsb((avg * controls[4] + controls[5]).toDouble(), 1.0, 1.0)
 		gc.lineWidth = (avg * 6).toDouble()
 		gc.beginPath()
@@ -92,8 +92,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 		gc.stroke()
 		gc.closePath()
 	}
-
-	private fun normalized(f: Float): Float = (f / 100f).coerceIn(0.0f, 0.99f)
 
 	private fun height(magnitude: Float): Float {
 		return ((magnitude + 90).toDouble().pow(2.3).toFloat() / 40).coerceAtLeast(0f)
