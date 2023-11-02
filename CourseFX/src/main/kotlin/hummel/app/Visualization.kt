@@ -64,11 +64,15 @@ class Visualization(windowSize: WindowSize) : Group() {
 		}
 
 		children.addAll(
-			createLabel(offsetter[0], 640.0 - 0.0),
-			createLabel(offsetter[255], 1280.0 - 40.0),
-			createLabel(offsetter[255], 0.0 + 5.0),
-			createLabel(offsetter[128], 320.0 - 40.0),
-			createLabel(offsetter[128], 960.0 + 5.0)
+			createLabel(offsetter[254], 0.0 + 5.0),
+			createLabel(offsetter[192], 160.0 + 5.0),
+			createLabel(offsetter[128], 320.0 + 5.0),
+			createLabel(offsetter[64], 480.0 + 5.0),
+			createLabel(offsetter[0], 640.0),
+			createLabel(offsetter[64], 800.0 - 40.0),
+			createLabel(offsetter[128], 960.0 - 40.0),
+			createLabel(offsetter[192], 1120.0 - 40.0),
+			createLabel(offsetter[254], 1280.0 - 40.0),
 		)
 	}
 
