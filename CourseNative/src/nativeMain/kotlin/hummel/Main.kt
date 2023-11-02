@@ -55,7 +55,7 @@ fun main(args: Array<String>) {
 			writeWavHeader(it, wfx.nChannels, wfx.nSamplesPerSec, wfx.wBitsPerSample, wh.dwBytesRecorded)
 			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), it)
 			fclose(it)
-		} ?: {
+		} ?: run {
 			println("Error opening file $path")
 		}
 
