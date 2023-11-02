@@ -3,11 +3,9 @@ package hummel.app
 import javafx.scene.Group
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.control.Label
 import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
-import javafx.scene.text.Font
 import kotlin.math.pow
 
 class Visualization(windowSize: WindowSize) : Group() {
@@ -22,7 +20,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 	private var width: Float = 4f
 	private var rootHeight: Float
 	private var centerX: Float
-	private var bottomText: Label
 	private var controls: FloatArray = floatArrayOf(
 		-60.0f,  // threshold
 		2.0f,    // acceleration
@@ -54,13 +51,6 @@ class Visualization(windowSize: WindowSize) : Group() {
 		canvas.translateXProperty().bind(windowSize.width.subtract(canvas.width).divide(2))
 		canvas.translateYProperty().bind(windowSize.height.subtract(canvas.height).divide(2))
 		children.add(canvas)
-
-		bottomText = Label(offsetter[200].toString())
-		bottomText.textFill = Color.WHITE
-		bottomText.font = Font("Arial", 20.0)
-		val center = windowSize.width.divide(2)
-		bottomText.layoutXProperty().bind(center)
-		children.add(bottomText)
 	}
 
 	fun update(magnitudes: FloatArray) {
