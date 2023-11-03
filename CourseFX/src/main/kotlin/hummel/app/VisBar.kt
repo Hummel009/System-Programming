@@ -40,13 +40,12 @@ class VisBar : Group(), Updatable {
 		reflection.bottomOpacity = 1.0
 		reflection.fraction = 1.0
 		effect = reflection
-		canvas.translateX = -640.0
 		canvas.translateY = -360.0
 		children.add(canvas)
 		length = 128
 		rootHeight = 0.5f * canvas.height.toFloat()
 
-		bars = (0 until length).map { i ->
+		bars = (0 until 64).map { i ->
 			Bar(
 				Vector2D(canvas.width.toFloat() / length * i, rootHeight),
 				Vector2D(canvas.width.toFloat() / length * 0.75f, 0f)
@@ -64,11 +63,10 @@ class VisBar : Group(), Updatable {
 		}
 		gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
 		gc.fill = Color.WHITE
-		for (i in 0 until length) {
-			val mag = magnitudes[i]
+		for (i in 0 until 64) {
 			val oldHeight: Float = bars[i].size.y
-			var newHeight = oldHeight - (oldHeight - height(mag)) / controls[1]
-			bars[i].setHeight(newHeight)
+			var newHeight = oldHeight - (oldHeight - height(magnitudes[i])) / controls[1]
+			bars[i].size.y = newHeight
 			val normalHeight = normalized(newHeight)
 			newHeight *= controls[2] / 2
 			bloom.threshold = controls[3].toDouble()
@@ -78,22 +76,13 @@ class VisBar : Group(), Updatable {
 				normalHeight.toDouble(),
 				controls[7].toDouble()
 			)
-			val x = bars[i].pos.x + 645
+			val x = bars[i].pos.x + 2
 			val y = rootHeight - newHeight
 			gc.fillRect(x.toDouble(), y.toDouble(), (bars[i].size.x).toDouble(), newHeight.toDouble())
 		}
 	}
 
 	class Bar(val pos: Vector2D, val size: Vector2D) {
-		class Vector2D(var x: Float, var y: Float) {
-			fun add(vec: Vector2D) {
-				x += vec.x
-				y += vec.y
-			}
-		}
-
-		fun setHeight(height: Float) {
-			size.y = height
-		}
+		class Vector2D(var x: Float, var y: Float)
 	}
 }
