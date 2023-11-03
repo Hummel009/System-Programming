@@ -30,7 +30,6 @@ class Visualization : Group(), Updatable {
 		86.0f,   // magnitude
 		0.0f     // color offset
 	)
-	private lateinit var bottomText: Label
 
 	init {
 		canvas.width = 2560.0
@@ -107,7 +106,7 @@ class Visualization : Group(), Updatable {
 	}
 
 	private fun createLabel(value: Float, layoutX: Double): Label {
-		bottomText = Label(value.toInt().toString())
+		val bottomText = Label(value.toInt().toString())
 		bottomText.textFill = Color.WHITE
 		bottomText.font = Font("Arial", 20.0)
 		bottomText.layoutX = layoutX
