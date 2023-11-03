@@ -7,7 +7,6 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
-import kotlin.math.pow
 
 
 class VisBar : Group(), Updatable {
@@ -80,14 +79,6 @@ class VisBar : Group(), Updatable {
 			val y = rootHeight - newHeight
 			gc.fillRect(x.toDouble(), y.toDouble(), (bars[i].size.x).toDouble(), newHeight.toDouble())
 		}
-	}
-
-	private fun normalized(f: Float): Float {
-		return (f / 100f).coerceIn(0.0f, 0.99f)
-	}
-
-	private fun height(magnitude: Float): Float {
-		return ((magnitude + 90).toDouble().pow(2.3).toFloat() / 40).coerceAtLeast(0f)
 	}
 
 	class Bar(val pos: Vector2D, val size: Vector2D) {
