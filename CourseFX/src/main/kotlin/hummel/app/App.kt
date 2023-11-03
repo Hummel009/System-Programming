@@ -1,11 +1,12 @@
 package hummel.app
 
-import hummel.file
+import hummel.GUI
 import javafx.application.Application
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.layout.*
 import javafx.scene.media.AudioSpectrumListener
@@ -13,6 +14,7 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import java.io.File
 import java.net.MalformedURLException
 import java.util.function.Consumer
 import kotlin.system.exitProcess
@@ -20,9 +22,10 @@ import kotlin.system.exitProcess
 class App : Application() {
 	private var playing: Boolean = false
 	private lateinit var scene: Scene
+	private lateinit var file: File
+	private lateinit var visualization: Group
 
 	override fun init() {
-		val visualization = Visualization()
 		var mediaPlayer: MediaPlayer?
 
 		val pane = Pane()
@@ -42,7 +45,7 @@ class App : Application() {
 					mp.audioSpectrumNumBands = 1024
 					mp.audioSpectrumListener =
 						AudioSpectrumListener { _: Double, _: Double, floats: FloatArray, _: FloatArray ->
-							Consumer<FloatArray> { visualization.update(it) }.accept(floats)
+							Consumer<FloatArray> { (visualization as Updatable).update(it) }.accept(floats)
 						}
 					if (!playing) {
 						pane.children.add(visualization)
@@ -64,6 +67,8 @@ class App : Application() {
 	}
 
 	override fun start(stage: Stage) {
+		file = GUI.file
+		visualization = GUI.visualization.getDeclaredConstructor().newInstance() as Group
 		stage.title = "Hummel009's Media Player"
 		stage.setScene(scene)
 		stage.show()

@@ -3,15 +3,15 @@ package hummel
 import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTheme
 import hummel.app.App
+import hummel.app.Visualization
 import javafx.application.Application
+import javafx.scene.Group
 import java.awt.BorderLayout
 import java.awt.EventQueue
 import java.awt.GridLayout
 import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-
-lateinit var file: File
 
 fun main() {
 	FlatLightLaf.setup()
@@ -27,6 +27,11 @@ fun main() {
 }
 
 class GUI : JFrame() {
+	companion object {
+		lateinit var file: File
+		lateinit var visualization: Class<out Group>
+	}
+
 	init {
 		title = "Hummel009's Audio Master"
 		defaultCloseOperation = EXIT_ON_CLOSE
@@ -66,6 +71,7 @@ class GUI : JFrame() {
 
 		val visButton = JButton("Запуск визуализации")
 		visButton.addActionListener {
+			visualization = Visualization::class.java
 			file = File(fileField.text)
 			Application.launch(App::class.java)
 		}

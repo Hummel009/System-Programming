@@ -10,7 +10,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import kotlin.math.pow
 
-class Visualization : Group() {
+class Visualization : Group(), Updatable {
 	private var canvas: Canvas = Canvas()
 	private var gc: GraphicsContext
 	private var bloom: Bloom
@@ -55,14 +55,6 @@ class Visualization : Group() {
 		canvas.translateY = -360.0
 		children.add(canvas)
 
-		fun createLabel(value: Float, layoutX: Double): Label {
-			bottomText = Label(value.toInt().toString())
-			bottomText.textFill = Color.WHITE
-			bottomText.font = Font("Arial", 20.0)
-			bottomText.layoutX = layoutX
-			return bottomText
-		}
-
 		children.addAll(
 			createLabel(offsetter[254], 0.0 + 5.0),
 			createLabel(offsetter[192], 160.0 + 5.0),
@@ -76,7 +68,7 @@ class Visualization : Group() {
 		)
 	}
 
-	fun update(magnitudes: FloatArray) {
+	override fun update(magnitudes: FloatArray) {
 		if (!isVisible) {
 			return
 		}
@@ -112,5 +104,13 @@ class Visualization : Group() {
 
 	private fun offsettingMap(length: Int): FloatArray {
 		return FloatArray(length) { i -> (i * ((i - 128).toDouble().pow(2.0).toFloat() / 10000.0f + 1)) }
+	}
+
+	private fun createLabel(value: Float, layoutX: Double): Label {
+		bottomText = Label(value.toInt().toString())
+		bottomText.textFill = Color.WHITE
+		bottomText.font = Font("Arial", 20.0)
+		bottomText.layoutX = layoutX
+		return bottomText
 	}
 }
