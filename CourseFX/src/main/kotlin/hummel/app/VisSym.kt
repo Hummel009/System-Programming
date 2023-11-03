@@ -10,7 +10,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import kotlin.math.pow
 
-class Visualization : Group(), Updatable {
+class VisSym : Group(), Updatable {
 	private var canvas: Canvas = Canvas()
 	private var gc: GraphicsContext
 	private var bloom: Bloom
@@ -74,7 +74,7 @@ class Visualization : Group(), Updatable {
 		bloom.threshold = controls[3].toDouble()
 		val heightMult = (controls[2] / 2).toDouble()
 		gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-		val avg = ((magnitudes.copyOf(length).average()).toFloat() / 100f).coerceIn(0.0f, 0.99f)
+		val avg = normalized(magnitudes.copyOf(length).average().toFloat())
 		gc.stroke = Color.hsb((avg * controls[4] + controls[5]).toDouble(), 1.0, 1.0)
 		gc.lineWidth = (avg * 6).toDouble()
 		gc.beginPath()
@@ -95,6 +95,10 @@ class Visualization : Group(), Updatable {
 		}
 		gc.stroke()
 		gc.closePath()
+	}
+
+	private fun normalized(f: Float): Float {
+		return (f / 100f).coerceIn(0.0f, 0.99f)
 	}
 
 	private fun height(magnitude: Float): Float {

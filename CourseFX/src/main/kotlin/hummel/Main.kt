@@ -3,7 +3,8 @@ package hummel
 import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTheme
 import hummel.app.App
-import hummel.app.Visualization
+import hummel.app.VisBar
+import hummel.app.VisSym
 import javafx.application.Application
 import javafx.scene.Group
 import java.awt.BorderLayout
@@ -35,7 +36,7 @@ class GUI : JFrame() {
 	init {
 		title = "Hummel009's Audio Master"
 		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(0, 0, 500, 156)
+		setBounds(0, 0, 500, 186)
 
 		val contentPanel = JPanel()
 		contentPanel.border = EmptyBorder(5, 5, 5, 5)
@@ -55,6 +56,21 @@ class GUI : JFrame() {
 		fileField.text = "C:\\Users\\Hummel009\\Downloads\\test.wav"
 		inputPanel.add(fileField)
 
+		var sym = true
+		val radioSym = JRadioButton("Симметричная визуализация")
+		val radioBar = JRadioButton("Плиточная визуализация")
+		radioSym.isSelected = true
+		radioSym.addActionListener {
+			sym = false
+			radioBar.isSelected = false
+		}
+		radioBar.addActionListener {
+			sym = false
+			radioSym.isSelected = false
+		}
+		inputPanel.add(radioSym)
+		inputPanel.add(radioBar)
+
 		val recButton = JButton("Запись звука")
 		recButton.addActionListener {
 			val exePath =
@@ -71,7 +87,7 @@ class GUI : JFrame() {
 
 		val visButton = JButton("Запуск визуализации")
 		visButton.addActionListener {
-			visualization = Visualization::class.java
+			visualization = if (sym) VisSym::class.java else VisBar::class.java
 			file = File(fileField.text)
 			Application.launch(App::class.java)
 		}
