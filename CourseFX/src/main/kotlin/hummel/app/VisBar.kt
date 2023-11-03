@@ -45,12 +45,12 @@ class VisBar : Group(), Updatable {
 		length = 128
 		rootHeight = 0.5f * canvas.height.toFloat()
 
-		bars = (0 until 64).map { i ->
+		bars = Array(64) {
 			Bar(
-				Vector2D(canvas.width.toFloat() / length * i, rootHeight),
+				Vector2D(canvas.width.toFloat() / length * it, rootHeight),
 				Vector2D(canvas.width.toFloat() / length * 0.75f, 0f)
 			)
-		}.toTypedArray()
+		}
 
 		children.addAll(
 			createLabel("0.0", 0.0), createLabel("0.5", 462.5), createLabel("1.0", 925.0)
