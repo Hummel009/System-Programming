@@ -10,7 +10,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import kotlin.math.pow
 
-class Visualization(windowSize: WindowSize) : Group() {
+class Visualization : Group() {
 	private var canvas: Canvas = Canvas()
 	private var gc: GraphicsContext
 	private var bloom: Bloom
@@ -51,8 +51,8 @@ class Visualization(windowSize: WindowSize) : Group() {
 		reflection.bottomOpacity = 1.0
 		reflection.fraction = 1.0
 		effect = reflection
-		canvas.translateXProperty().bind(windowSize.width.subtract(canvas.width).divide(2))
-		canvas.translateYProperty().bind(windowSize.height.subtract(canvas.height).divide(2))
+		canvas.translateX = -640.0
+		canvas.translateY = -360.0
 		children.add(canvas)
 
 		fun createLabel(value: Float, layoutX: Double): Label {
