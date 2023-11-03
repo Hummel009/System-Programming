@@ -8,7 +8,6 @@ import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
 
-
 class VisBar : Group(), Updatable {
 	private var canvas: Canvas = Canvas()
 	private var gc: GraphicsContext
@@ -55,9 +54,7 @@ class VisBar : Group(), Updatable {
 		}.toTypedArray()
 
 		children.addAll(
-			createLabel("0.0", 0.0),
-			createLabel("0.5", 462.5),
-			createLabel("1.0", 925.0)
+			createLabel("0.0", 0.0), createLabel("0.5", 462.5), createLabel("1.0", 925.0)
 		)
 	}
 
