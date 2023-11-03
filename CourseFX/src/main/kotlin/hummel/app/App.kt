@@ -14,6 +14,7 @@ import javafx.scene.paint.Color
 import java.io.File
 import java.net.MalformedURLException
 import java.util.function.Consumer
+import kotlin.system.exitProcess
 
 class App(private var visualization: Group, private var file: File) {
 	private var playing: Boolean = false
@@ -33,6 +34,9 @@ class App(private var visualization: Group, private var file: File) {
 		scene = Scene(stackPane, 1280.0, 720.0)
 		scene.onMousePressed = EventHandler<Event> {
 			try {
+				if (!file.exists()) {
+					exitProcess(1)
+				}
 				val media = Media(file.toURI().toURL().toString())
 				mediaPlayer = MediaPlayer(media)
 				mediaPlayer?.let { mp ->
@@ -54,8 +58,7 @@ class App(private var visualization: Group, private var file: File) {
 						playing = false
 					}
 				}
-			} catch (e: MalformedURLException) {
-				e.printStackTrace()
+			} catch (ignored: MalformedURLException) {
 			}
 		}
 	}

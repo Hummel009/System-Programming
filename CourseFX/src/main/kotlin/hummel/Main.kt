@@ -76,9 +76,9 @@ class GUI : JFrame() {
 
 			val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
 			val process = processBuilder.start()
-			val exitCode = process.waitFor()
+			process.waitFor()
 			JOptionPane.showMessageDialog(
-				this, "Код завершения: $exitCode", "Message", JOptionPane.INFORMATION_MESSAGE
+				this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
 			)
 		}
 
