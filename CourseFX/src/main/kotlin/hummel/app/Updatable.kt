@@ -1,5 +1,8 @@
 package hummel.app
 
+import javafx.scene.control.Label
+import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import kotlin.math.pow
 
 interface Updatable {
@@ -11,5 +14,13 @@ interface Updatable {
 
 	fun height(magnitude: Float): Float {
 		return ((magnitude + 90).toDouble().pow(2.3).toFloat() / 40).coerceAtLeast(0f)
+	}
+
+	fun createLabel(value: String, layoutX: Double): Label {
+		val bottomText = Label(value)
+		bottomText.textFill = Color.WHITE
+		bottomText.font = Font("Arial", 20.0)
+		bottomText.layoutX = layoutX
+		return bottomText
 	}
 }

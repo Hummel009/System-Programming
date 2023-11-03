@@ -58,7 +58,7 @@ class GUI : JFrame() {
 		val radioBar = JRadioButton("Плиточная визуализация")
 		radioSym.isSelected = true
 		radioSym.addActionListener {
-			sym = false
+			sym = true
 			radioBar.isSelected = false
 		}
 		radioBar.addActionListener {

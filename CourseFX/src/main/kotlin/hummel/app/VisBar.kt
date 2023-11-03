@@ -53,6 +53,12 @@ class VisBar : Group(), Updatable {
 				Vector2D(canvas.width.toFloat() / length * 0.75f, 0f)
 			)
 		}.toTypedArray()
+
+		children.addAll(
+			createLabel("0.0", 0.0),
+			createLabel("0.5", 462.5),
+			createLabel("1.0", 925.0)
+		)
 	}
 
 	override fun update(magnitudes: FloatArray) {
@@ -75,7 +81,7 @@ class VisBar : Group(), Updatable {
 				normalHeight.toDouble(),
 				controls[7].toDouble()
 			)
-			val x = bars[i].pos.x + 640
+			val x = bars[i].pos.x + 645
 			val y = rootHeight - newHeight
 			gc.fillRect(x.toDouble(), y.toDouble(), (bars[i].size.x).toDouble(), newHeight.toDouble())
 		}

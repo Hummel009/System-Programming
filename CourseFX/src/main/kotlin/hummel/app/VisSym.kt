@@ -3,12 +3,9 @@ package hummel.app
 import javafx.scene.Group
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.control.Label
 import javafx.scene.effect.Bloom
 import javafx.scene.effect.Reflection
 import javafx.scene.paint.Color
-import javafx.scene.text.Font
-import kotlin.math.pow
 
 class VisSym : Group(), Updatable {
 	private var canvas: Canvas = Canvas()
@@ -17,7 +14,6 @@ class VisSym : Group(), Updatable {
 	private var reflection: Reflection
 	private var heights: FloatArray
 	private var lazyHeights: FloatArray
-	private var offsetter: FloatArray
 	private var length: Int = 256
 	private var width: Float = 4f
 	private var rootHeight: Float
@@ -39,7 +35,6 @@ class VisSym : Group(), Updatable {
 		bloom = Bloom()
 		canvas.effect = bloom
 		length = 256
-		offsetter = offsettingMap(length)
 		heights = FloatArray(length)
 		lazyHeights = FloatArray(length)
 		rootHeight = 0.5f * canvas.height.toFloat()
@@ -55,15 +50,13 @@ class VisSym : Group(), Updatable {
 		children.add(canvas)
 
 		children.addAll(
-			createLabel(offsetter[254], 0.0 + 5.0),
-			createLabel(offsetter[192], 160.0 + 5.0),
-			createLabel(offsetter[128], 320.0 + 5.0),
-			createLabel(offsetter[64], 480.0 + 5.0),
-			createLabel(offsetter[0], 640.0),
-			createLabel(offsetter[64], 800.0 - 40.0),
-			createLabel(offsetter[128], 960.0 - 40.0),
-			createLabel(offsetter[192], 1120.0 - 40.0),
-			createLabel(offsetter[254], 1280.0 - 40.0),
+			createLabel("2.0", 70.0),
+			createLabel("1.0", 255.0),
+			createLabel("0.5", 440.0),
+			createLabel("0.0", 625.0),
+			createLabel("0.5", 810.0),
+			createLabel("1.0", 995.0),
+			createLabel("2.0", 1180.0)
 		)
 	}
 
@@ -84,28 +77,16 @@ class VisSym : Group(), Updatable {
 			heights[i] = newHeight
 			lazyHeights[i] = if (newHeight > lazyHeights[i]) newHeight else lazyHeights[i] * 0.99f
 			newHeight *= heightMult.toFloat()
-			val x = centerX - width * offsetter[i]
+			val x = centerX - width * i * 2
 			val y = rootHeight - newHeight
 			gc.lineTo(x.toDouble(), y.toDouble())
 		}
 		for (i in 0 until length) {
-			val x = centerX + width * offsetter[i]
+			val x = centerX + width * i * 2
 			val y = rootHeight - heights[i] * heightMult.toFloat()
 			gc.lineTo(x.toDouble(), y.toDouble())
 		}
 		gc.stroke()
 		gc.closePath()
-	}
-
-	private fun offsettingMap(length: Int): FloatArray {
-		return FloatArray(length) { i -> (i * ((i - 128).toDouble().pow(2.0).toFloat() / 10000.0f + 1)) }
-	}
-
-	private fun createLabel(value: Float, layoutX: Double): Label {
-		val bottomText = Label(value.toInt().toString())
-		bottomText.textFill = Color.WHITE
-		bottomText.font = Font("Arial", 20.0)
-		bottomText.layoutX = layoutX
-		return bottomText
 	}
 }
