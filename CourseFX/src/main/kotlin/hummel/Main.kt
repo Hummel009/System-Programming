@@ -90,8 +90,12 @@ class GUI : JFrame() {
 				val stage = Stage()
 				stage.title = "Hummel009's Media Player"
 				stage.setScene(app.scene)
-				stage.showAndWait()
-				exitProcess(0)
+				stage.show()
+				stage.setOnCloseRequest {
+					it.consume()
+					stage.hide()
+					exitProcess(0)
+				}
 			}
 		}
 
