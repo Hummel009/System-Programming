@@ -5,14 +5,16 @@ import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTh
 import hummel.app.App
 import hummel.app.VisBar
 import hummel.app.VisSym
-import javafx.application.Application
-import javafx.scene.Group
+import javafx.application.Platform
+import javafx.embed.swing.JFXPanel
+import javafx.stage.Stage
 import java.awt.BorderLayout
 import java.awt.EventQueue
 import java.awt.GridLayout
 import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
+import kotlin.system.exitProcess
 
 fun main() {
 	FlatLightLaf.setup()
@@ -28,11 +30,6 @@ fun main() {
 }
 
 class GUI : JFrame() {
-	companion object {
-		lateinit var file: File
-		lateinit var visualization: Class<out Group>
-	}
-
 	init {
 		title = "Hummel009's Audio Master"
 		defaultCloseOperation = EXIT_ON_CLOSE
@@ -87,9 +84,15 @@ class GUI : JFrame() {
 
 		val visButton = JButton("Запуск визуализации")
 		visButton.addActionListener {
-			visualization = if (sym) VisSym::class.java else VisBar::class.java
-			file = File(fileField.text)
-			Application.launch(App::class.java)
+			JFXPanel()
+			val app = App(if (sym) VisSym() else VisBar(), File(fileField.text))
+			Platform.runLater {
+				val stage = Stage()
+				stage.title = "Hummel009's Media Player"
+				stage.setScene(app.scene)
+				stage.showAndWait()
+				exitProcess(0)
+			}
 		}
 
 		contentPanel.add(inputPanel, BorderLayout.NORTH)

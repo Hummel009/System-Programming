@@ -1,7 +1,5 @@
 package hummel.app
 
-import hummel.GUI
-import javafx.application.Application
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -13,19 +11,15 @@ import javafx.scene.media.AudioSpectrumListener
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
-import javafx.stage.Stage
 import java.io.File
 import java.net.MalformedURLException
 import java.util.function.Consumer
-import kotlin.system.exitProcess
 
-class App : Application() {
+class App(private var visualization: Group, private var file: File) {
 	private var playing: Boolean = false
-	private lateinit var scene: Scene
-	private lateinit var file: File
-	private lateinit var visualization: Group
+	var scene: Scene
 
-	override fun init() {
+	init {
 		var mediaPlayer: MediaPlayer?
 
 		val pane = Pane()
@@ -63,19 +57,6 @@ class App : Application() {
 			} catch (e: MalformedURLException) {
 				e.printStackTrace()
 			}
-		}
-	}
-
-	override fun start(stage: Stage) {
-		file = GUI.file
-		visualization = GUI.visualization.getDeclaredConstructor().newInstance() as Group
-		stage.title = "Hummel009's Media Player"
-		stage.setScene(scene)
-		stage.show()
-		stage.setOnCloseRequest {
-			it.consume()
-			stage.hide()
-			exitProcess(0)
 		}
 	}
 }

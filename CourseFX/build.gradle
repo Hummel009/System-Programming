@@ -30,7 +30,7 @@ application {
 
 javafx {
 	version = '22-ea+11'
-	modules = ['javafx.media', 'javafx.controls']
+	modules = ['javafx.media', 'javafx.controls', 'javafx.swing']
 }
 
 jar {
