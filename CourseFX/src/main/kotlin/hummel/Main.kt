@@ -60,10 +60,12 @@ class GUI : JFrame() {
 		radioSym.addActionListener {
 			sym = true
 			radioBar.isSelected = false
+			radioSym.isSelected = true
 		}
 		radioBar.addActionListener {
 			sym = false
 			radioSym.isSelected = false
+			radioBar.isSelected = true
 		}
 		inputPanel.add(radioSym)
 		inputPanel.add(radioBar)
