@@ -5,7 +5,7 @@ import java.util.Collections.sort
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 
-fun main() {
+fun launchTask3() {
 	val executors = 3
 	var lists: List<List<String>>? = null
 

@@ -3,7 +3,7 @@ package hummel
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 
-fun main() {
+fun launchTask2() {
 	val tasks = 10
 	val executors = 3
 

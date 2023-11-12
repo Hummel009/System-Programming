@@ -3,7 +3,7 @@ package hummel
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 
-fun main() {
+fun launchTask1() {
 	val queue = ConcurrentLinkedQueue<() -> Unit>()
 
 	val threads = mutableListOf<Thread>()

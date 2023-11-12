@@ -59,7 +59,7 @@ fun main() {
 	ExUser32.INSTANCE.ShowWindow(hWnd, SW_SHOW)
 	ExUser32.INSTANCE.UpdateWindow(hWnd)
 
-	for (key in HotKeys.values()) {
+	for (key in HotKeys.entries) {
 		ExUser32.INSTANCE.RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
 	}
 
