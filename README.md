@@ -16,12 +16,12 @@
 * Lab04, CourseNative - это проекты Gradle, которые должны быть открыты через IntelliJ IDEA.
   * Используемая версия Gradle - 8.4.
   * Используемая версия Kotlin Native - 1.9.20.
-  * Используемая версия JDK - Eclipse Temurin 1.8.0_392.
+  * Используемая версия JDK - Eclipse Temurin 17.0.9.
   * Используемая платформа - Windows.
 * CourseFX - это проект Gradle, который должен быть открыт через IntelliJ IDEA или импортирован в Eclipse IDE с плагином Kotlin.
   * Используемая версия Gradle - 8.4.
   * Используемая версия Kotlin - 1.9.20.
-  * Используемая версия JDK - Eclipse Temurin 17.0.8.
+  * Используемая версия JDK - Eclipse Temurin 17.0.9.
 
 ## Условия работ
 
