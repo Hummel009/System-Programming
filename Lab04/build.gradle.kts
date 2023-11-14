@@ -3,6 +3,7 @@ import java.time.format.DateTimeFormatter
 
 plugins {
 	id("org.jetbrains.kotlin.multiplatform") version "1.9.20"
+	id("idea")
 }
 
 group = "hummel"
@@ -33,5 +34,11 @@ kotlin {
 				optIn("kotlinx.cinterop.ExperimentalForeignApi")
 			}
 		}
+	}
+}
+
+idea {
+	module {
+		jdkName = "17"
 	}
 }
