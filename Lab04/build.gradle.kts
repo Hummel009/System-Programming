@@ -25,6 +25,7 @@ kotlin {
 			executable {
 				entryPoint("hummel.main")
 				linkerOpts("-lwinmm")
+				baseName = "${project.name}-${project.version}"
 			}
 		}
 	}
