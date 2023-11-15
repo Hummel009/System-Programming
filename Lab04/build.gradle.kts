@@ -20,7 +20,7 @@ java {
 }
 
 kotlin {
-	mingwX64("native") {
+	mingwX64 {
 		binaries {
 			executable {
 				entryPoint("hummel.main")
