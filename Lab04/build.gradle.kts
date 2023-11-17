@@ -37,9 +37,3 @@ kotlin {
 		}
 	}
 }
-
-idea {
-	module {
-		jdkName = "17"
-	}
-}
