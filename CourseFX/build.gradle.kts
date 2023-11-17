@@ -5,8 +5,6 @@ plugins {
 	id("org.jetbrains.kotlin.jvm") version "1.9.20"
 	id("org.openjfx.javafxplugin") version "0.1.0"
 	id("application")
-	id("idea")
-	id("eclipse")
 }
 
 group = "org.example"
@@ -46,7 +44,7 @@ tasks {
 			)
 		}
 		from(configurations.runtimeClasspath.get().map {
-			if (it.isDirectory()) it else zipTree(it)
+			if (it.isDirectory) it else zipTree(it)
 		})
 		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	}
