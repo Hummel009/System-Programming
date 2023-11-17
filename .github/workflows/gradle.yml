@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: compiled-artifact
-          path: ./Lab04/build/bin/native/releaseExecutable/*.exe
+          path: ./Lab04/build/bin/mingwX64/releaseExecutable/*.exe
   build5:
     runs-on: windows-latest
     steps:
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: compiled-artifact
-          path: ./CourseNative/build/bin/native/releaseExecutable/*.exe
+          path: ./CourseNative/build/bin/mingwX64/releaseExecutable/*.exe
   buildcfx:
     runs-on: windows-latest
     steps:
