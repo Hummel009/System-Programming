@@ -27,19 +27,6 @@ java {
 	}
 }
 
-idea {
-	module {
-		jdkName = "17"
-	}
-}
-
-eclipse {
-	jdt {
-		sourceCompatibility = JavaVersion.VERSION_17
-		targetCompatibility = JavaVersion.VERSION_17
-	}
-}
-
 application {
 	mainClass = "hummel.MainKt"
 }
@@ -59,7 +46,7 @@ tasks {
 			)
 		}
 		from(configurations.runtimeClasspath.get().map {
-			if (it.isDirectory) it else zipTree(it)
+			if (it.isDirectory()) it else zipTree(it)
 		})
 		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	}
