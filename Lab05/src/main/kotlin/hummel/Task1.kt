@@ -7,11 +7,11 @@ fun launchTask1() {
 	val queue = ConcurrentLinkedQueue<() -> Unit>()
 
 	val threads = mutableListOf<Thread>()
-	repeat(10) { threads.add(thread { queue.add { println("задание из потока $it") } }) }
+	repeat(10) { threads.add(thread { queue.add { println("task from thread $it") } }) }
 	threads.forEach { it.join() }
 
 	while (!queue.isEmpty()) {
-		print("Выполняю ")
+		print("Executing ")
 		queue.poll().invoke()
 	}
 }

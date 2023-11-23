@@ -47,4 +47,3 @@ private fun List<String>.mergeSort(): List<String> {
 		mergeStrings(left.mergeSort(), right.mergeSort())
 	}
 }
-

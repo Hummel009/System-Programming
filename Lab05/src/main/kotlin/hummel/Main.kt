@@ -1,22 +1,19 @@
 package hummel
 
-import java.nio.charset.StandardCharsets
-import java.util.*
-
 fun main() {
-	Scanner(System.`in`, StandardCharsets.UTF_8).use {
-		loop@ while (true) {
-			val command = it.nextLine()
+	val functions = mapOf(
+		"launchTask1" to ::launchTask1,
+		"launchTask2" to ::launchTask2,
+		"launchTask3" to ::launchTask3,
+	)
+	while (true) {
+		print("Enter the command: ")
+		val command = readln()
 
-			if (command.contains("1")) {
-				launchTask1()
-			} else if (command.contains("2")) {
-				launchTask2()
-			} else if (command.contains("3")) {
-				launchTask3()
-			} else if (command.contains("exit")) {
-				break@loop
-			}
+		if ("exit" == command) {
+			break
 		}
+
+		functions[command]?.invoke() ?: println("Unknown command!")
 	}
 }

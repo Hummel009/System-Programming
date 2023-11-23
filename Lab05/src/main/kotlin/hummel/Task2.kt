@@ -10,7 +10,7 @@ fun launchTask2() {
 	val queue = ConcurrentLinkedQueue<() -> Unit>()
 
 	val threads = mutableListOf<Thread>()
-	repeat(tasks) { threads.add(thread { queue.add { println("задание из потока $it") } }) }
+	repeat(tasks) { threads.add(thread { queue.add { println("task from thread $it") } }) }
 	threads.forEach { it.join() }
 
 	val avg = tasks / executors
@@ -20,7 +20,7 @@ fun launchTask2() {
 	repeat(executors) {
 		thread {
 			repeat(strategy[it]) {
-				print("Поток $it: выполняю ")
+				print("Thread $it: executing ")
 				queue.poll().invoke()
 			}
 		}.join()
