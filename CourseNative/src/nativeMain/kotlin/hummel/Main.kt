@@ -6,6 +6,7 @@ import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fwrite
 import platform.windows.*
+import kotlin.system.exitProcess
 
 val log: MutableMap<String, String> = mutableMapOf()
 
@@ -62,6 +63,10 @@ fun main(args: Array<String>) {
 		log.forEach { (key, value) -> println("$key: $value") }
 
 		println("Recorded: ${wh.dwBytesRecorded / 1000u} kbytes")
+
+		if (log.entries.any { it.value != "OK" }) {
+			exitProcess(1)
+		}
 	}
 }
 

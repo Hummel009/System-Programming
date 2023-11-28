@@ -83,7 +83,7 @@ class GUI : JFrame() {
 
 					val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
 					val process = processBuilder.start()
-					process.waitFor()
+					val res = process.waitFor()
 					JOptionPane.showMessageDialog(
 						this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
 					)
