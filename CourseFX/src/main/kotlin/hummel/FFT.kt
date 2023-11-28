@@ -39,8 +39,6 @@ fun readWavFile(filePath: String): DoubleArray? {
 		return null
 	}
 
-	val numChannels = byteArrayToShort(wavData, 22).toInt()
-	val sampleRate = byteArrayToInt(wavData, 24)
 	val bitsPerSample = byteArrayToShort(wavData, 34).toInt()
 
 	val subchunk2Id = String(wavData, 36, 4)
@@ -89,60 +87,67 @@ fun byteArrayToInt(byteArray: ByteArray, offset: Int): Int {
 	return buffer.int
 }
 
-fun fft(N: Int, REX: DoubleArray, IMX: DoubleArray) {
+fun fft(n: Int, rex: DoubleArray, imx: DoubleArray) {
 	//Set constants
-	val PI = 3.14159265
-	val NM1 = N - 1
-	val ND2 = N / 2
-	val M = (log2(N.toDouble())).toInt()
-	var J = ND2
-	var K: Int
+	val pi = Math.PI //1050
+	val nm1 = n - 1 //1060
+	val nd2 = n / 2 //1070
+	val m = log2(n.toDouble()).toInt() //1080
+	var j = nd2 //1090
+	var k: Int
 
 	//Bit reversal sorting
 	class GoTo1190 : Exception()
-	nextI@ for (I in 1 until N - 1) { //1110
+	nextI@ for (i in 1 until n - 1) { //1110
 		try {
-			if (I >= J) throw GoTo1190() //1120
-			val TR = REX[J] //1130
-			val TI = IMX[J] //1140
-			REX[J] = REX[I] //1150
-			IMX[J] = IMX[I] //1160
-			REX[I] = TR //1170
-			IMX[I] = TI //1180
-			throw GoTo1190() //1190
+			if (i >= j) throw GoTo1190() //1120
+			val tr = rex[j] //1130
+			val ti = imx[j] //1140
+			rex[j] = rex[i] //1150
+			imx[j] = imx[i] //1160
+			rex[i] = tr //1170
+			imx[i] = ti //1180
+			throw GoTo1190()
 		} catch (e: GoTo1190) {
-			K = ND2 //1190
-			while (K <= J) {
-				J -= K //1210
-				K /= 2 //1220
+			k = nd2 //1190
+			while (k <= j) {
+				j -= k //1210
+				k /= 2 //1220
 			}
-			J += K //1240
+			j += k //1240
 			continue@nextI //1250
 		}
 	}
 
-	for (L in 1..M) {
-		val LE = (2.0.pow(L.toDouble())).toInt()
-		val LE2 = LE / 2
-		var UR = 1.0
-		var UI = 0.0
-		val SR = cos(PI / LE2)
-		val SI = -sin(PI / LE2)
+	//Loop for each stage
+	for (l in 1..m) { //1270
+		val le = (2.0.pow(l)).toInt() //1280
+		val le2 = le / 2 //1290
+		var ur = 1.0 //1300
+		var ui = 0.0 //1310
 
-		for (J in 1..LE2) {
-			val JM1 = J - 1
-			for (I in JM1 until NM1 step LE) {
-				val IP = I + LE2
-				val TR = REX[IP] * UR - IMX[IP] * UI
-				val TI = REX[IP] * UI + IMX[IP] * UR
-				REX[IP] = REX[I] - TR
-				IMX[IP] = IMX[I] - TI
-				REX[I] = REX[I] + TR
-				IMX[I] = IMX[I] + TI
+		//Calculate sine & cosine values
+		val sr = cos(pi / le2) //1320
+		val si = -sin(pi / le2) //1330
+
+		for (jShad in 1..le2) { //1340
+			val jm1 = jShad - 1 //1350
+
+			//Loop for each butterfly
+			for (i in jm1..nm1 step le) { //1360
+				val ip = i + le2 //1370
+
+				//Butterfly calculation
+				val tr = rex[ip] * ur - imx[ip] * ui //1380
+				val ti = rex[ip] * ui + imx[ip] * ur //1390
+				rex[ip] = rex[i] - tr //1400
+				imx[ip] = imx[i] - ti //1410
+				rex[i] = rex[i] + tr //1420
+				imx[i] = imx[i] + ti //1430
 			}
-			val TR = UR
-			UR = TR * SR - UI * SI
-			UI = TR * SI + UI * SR
+			val tr = ur //1450
+			ur = tr * sr - ui * si //1460
+			ui = tr * si + ui * sr //1470
 		}
 	}
 }
@@ -155,19 +160,18 @@ fun main() {
 		val sampleCount = it.size
 		val fftSize = 2.0.pow(ceil(log2(sampleCount.toDouble()))).toInt()
 
-		// Создание массивов для разложения FFT
-		val REX = it.copyOf(fftSize)
-		val IMX = DoubleArray(fftSize)
+		val rex = it.copyOf(fftSize)
+		val imx = DoubleArray(fftSize)
 
 		// Выполнение разложения
-		fft(fftSize, REX, IMX)
+		fft(fftSize, rex, imx)
 
 		// Вывод результатов
 		val time = measureTime {
 			val result = buildString {
 				for (i in 0 until fftSize) {
-					append("REX[").append(i).append("] = ").append(REX[i]).append(", IMX[").append(i).append("] = ")
-						.append(IMX[i]).append("\r\n")
+					append("REX[").append(i).append("] = ").append(rex[i]).append(", IMX[").append(i).append("] = ")
+						.append(imx[i]).append("\r\n")
 				}
 			}
 			println(result)
