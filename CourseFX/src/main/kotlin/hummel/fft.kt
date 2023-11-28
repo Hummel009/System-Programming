@@ -97,10 +97,9 @@ fun fft(N: Int, REX: DoubleArray, IMX: DoubleArray) {
 	var J = ND2
 	var K: Int
 
+	//Bit reversal sorting
 	class GoTo1190 : Exception()
-	class GoTo1240 : Exception()
-
-	nextI@ for (I in 1 until N - 1) {
+	nextI@ for (I in 1 until N - 1) { //1110
 		try {
 			if (I >= J) throw GoTo1190() //1120
 			val TR = REX[J] //1130
@@ -109,52 +108,15 @@ fun fft(N: Int, REX: DoubleArray, IMX: DoubleArray) {
 			IMX[J] = IMX[I] //1160
 			REX[I] = TR //1170
 			IMX[I] = TI //1180
-			throw GoTo1190()
+			throw GoTo1190() //1190
 		} catch (e: GoTo1190) {
-			try {
-				K = ND2 //1190
-				if (K > J) throw GoTo1240()
-			} catch (e: GoTo1240) {
-				J += K
-				continue@nextI
-			}
-		}
-	}
-
-	//Bit reversal sorting
-	goto@ for (I in 1 until N - 1) { //1110
-		if (I >= J) { //1120
 			K = ND2 //1190
-			if (K > J) {
-				J += K
-				continue@goto
-			} else {
-				while (K > J) {
-					J += K
-				}
-				J -= K
-				K /= 2
-				continue@goto
+			while (K <= J) {
+				J -= K //1210
+				K /= 2 //1220
 			}
-		} else {
-			val TR = REX[J] //1130
-			val TI = IMX[J] //1140
-			REX[J] = REX[I] //1150
-			IMX[J] = IMX[I] //1160
-			REX[I] = TR //1170
-			IMX[I] = TI //1180
-			K = ND2 //1190
-			if (K > J) { //1200
-				J += K //1210
-				continue@goto
-			} else {
-				while (K > J) {
-					J -= K
-					K /= 2
-				}
-				J += K
-				continue@goto
-			}
+			J += K //1240
+			continue@nextI //1250
 		}
 	}
 
