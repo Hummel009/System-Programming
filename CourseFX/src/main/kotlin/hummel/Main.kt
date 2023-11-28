@@ -84,9 +84,15 @@ class GUI : JFrame() {
 					val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
 					val process = processBuilder.start()
 					val result = process.waitFor()
-					JOptionPane.showMessageDialog(
-						this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
-					)
+					if (result == 0) {
+						JOptionPane.showMessageDialog(
+							this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
+						)
+					} else {
+						JOptionPane.showMessageDialog(
+							this, "Ошибка микрофона", "Error", JOptionPane.ERROR_MESSAGE
+						)
+					}
 				}
 			} else {
 				JOptionPane.showMessageDialog(
