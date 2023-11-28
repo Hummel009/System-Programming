@@ -135,7 +135,8 @@ class GUI : JFrame() {
 		val fftButton = JButton("Запуск анализа")
 		fftButton.addActionListener {
 			thread {
-				val wavFile = File(fileField.text)
+				val wavFilePath = fileField.text
+				val wavFile = File(wavFilePath)
 				if (wavFile.exists()) {
 					try {
 						val fft = FFT(wavFile)
