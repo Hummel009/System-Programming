@@ -5,6 +5,7 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.*
+import kotlin.time.measureTime
 
 fun readWavFile(filePath: String): DoubleArray? {
 	val file = File(filePath)
@@ -162,8 +163,15 @@ fun main() {
 		fft(fftSize, REX, IMX)
 
 		// Вывод результатов
-		for (i in 0 until fftSize) {
-			println("REX[$i] = ${REX[i]}, IMX[$i] = ${IMX[i]}")
+		val time = measureTime {
+			val result = buildString {
+				for (i in 0 until fftSize) {
+					append("REX[").append(i).append("] = ").append(REX[i]).append(", IMX[").append(i).append("] = ")
+						.append(IMX[i]).append("\r\n")
+				}
+			}
+			println(result)
 		}
+		println(time.inWholeSeconds)
 	}
 }
