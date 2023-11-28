@@ -104,6 +104,7 @@ class FourierTransform(private var wavFile: File) {
 		return buffer.int
 	}
 
+	@Suppress("NAME_SHADOWING")
 	private fun basicFourierTransform(n: Int, rex: DoubleArray, imx: DoubleArray) {
 		var k: Int
 		var tr: Double
@@ -138,7 +139,7 @@ class FourierTransform(private var wavFile: File) {
 				throw GoTo1190()
 			} catch (e: GoTo1190) {
 				k = nd2 //1190
-				while (k <= j) {
+				while (k <= j) { //1220
 					j -= k //1210
 					k /= 2 //1220
 				}
@@ -158,8 +159,9 @@ class FourierTransform(private var wavFile: File) {
 			sr = cos(pi / le2) //1320
 			si = -sin(pi / le2) //1330
 
-			for (jShad in 1..le2) { //1340
-				jm1 = jShad - 1 //1350
+			//Loop for each sub DFT
+			for (j in 1..le2) { //1340
+				jm1 = j - 1 //1350
 
 				//Loop for each butterfly
 				for (i in jm1..nm1 step le) { //1360
