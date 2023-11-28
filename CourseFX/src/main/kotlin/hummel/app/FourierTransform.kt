@@ -7,7 +7,7 @@ import java.nio.ByteOrder
 import kotlin.math.*
 import kotlin.time.measureTime
 
-class FFT(private var wavFile: File) {
+class FourierTransform(private var wavFile: File) {
 	fun execute() {
 		val samples = getSamplesFromFile()
 
@@ -18,7 +18,7 @@ class FFT(private var wavFile: File) {
 		val imx = DoubleArray(fftSize)
 
 		// Выполнение разложения
-		basicFFT(fftSize, rex, imx)
+		basicFourierTransform(fftSize, rex, imx)
 
 		// Вывод результатов
 		val time = measureTime {
@@ -104,7 +104,7 @@ class FFT(private var wavFile: File) {
 		return buffer.int
 	}
 
-	private fun basicFFT(n: Int, rex: DoubleArray, imx: DoubleArray) {
+	private fun basicFourierTransform(n: Int, rex: DoubleArray, imx: DoubleArray) {
 		var k: Int
 		var tr: Double
 		var ti: Double

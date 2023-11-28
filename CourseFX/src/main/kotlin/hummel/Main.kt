@@ -3,7 +3,7 @@ package hummel
 import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTheme
 import hummel.app.App
-import hummel.app.FFT
+import hummel.app.FourierTransform
 import hummel.app.VisBar
 import hummel.app.VisSym
 import javafx.application.Platform
@@ -139,7 +139,7 @@ class GUI : JFrame() {
 				val wavFile = File(wavFilePath)
 				if (wavFile.exists()) {
 					try {
-						val fft = FFT(wavFile)
+						val fft = FourierTransform(wavFile)
 						fft.execute()
 					} catch (e: Exception) {
 						JOptionPane.showMessageDialog(
