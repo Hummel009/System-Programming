@@ -5,7 +5,6 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.*
-import kotlin.system.measureTimeMillis
 
 
 class FourierTransform(private var wavFile: File) {
@@ -28,23 +27,20 @@ class FourierTransform(private var wavFile: File) {
 		basicFourierTransform(fftSize, rex, imx)
 
 		// Вывод результатов
-		val time = measureTimeMillis {
-			val result = buildString {
-				for (i in 0 until fftSize) {
-					append("REX[")
-					append(i)
-					append("] = ")
-					append(rex[i])
-					append(", IMX[")
-					append(i)
-					append("] = ")
-					append(imx[i])
-					append("\r\n")
-				}
+		val result = buildString {
+			for (i in 0 until fftSize) {
+				append("REX[")
+				append(i)
+				append("] = ")
+				append(rex[i])
+				append(", IMX[")
+				append(i)
+				append("] = ")
+				append(imx[i])
+				append("\r\n")
 			}
-			println(result)
 		}
-		println(time)
+		File("${System.getProperty("user.home")}\\Downloads\\fft.txt").writeText(result)
 	}
 
 	private fun getSamplesFromFile(): DoubleArray {
