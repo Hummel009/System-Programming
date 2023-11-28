@@ -12,10 +12,14 @@ class FourierTransform(private var wavFile: File) {
 		val samples = getSamplesFromFile()
 
 		val sampleCount = samples.size
-		val fftSize = 2.0.pow(ceil(log2(sampleCount.toDouble()))).toInt()
 
+		val fftSize = 2.0.pow(ceil(log2(sampleCount.toDouble()))).toInt()
 		val rex = samples.copyOf(fftSize)
 		val imx = DoubleArray(fftSize)
+
+		//val fftSizeTest = 8
+		//val rexTest = doubleArrayOf(-2.0, 1.0, -1.0, 5.0, 0.0, 3.0, 0.0, -4.0)
+		//val imxTest = DoubleArray(8)
 
 		// Выполнение разложения
 		basicFourierTransform(fftSize, rex, imx)
@@ -24,8 +28,15 @@ class FourierTransform(private var wavFile: File) {
 		val time = measureTime {
 			val result = buildString {
 				for (i in 0 until fftSize) {
-					append("REX[").append(i).append("] = ").append(rex[i]).append(", IMX[").append(i).append("] = ")
-						.append(imx[i]).append("\r\n")
+					append("REX[")
+					append(i)
+					append("] = ")
+					append(rex[i])
+					append(", IMX[")
+					append(i)
+					append("] = ")
+					append(imx[i])
+					append("\r\n")
 				}
 			}
 			println(result)
