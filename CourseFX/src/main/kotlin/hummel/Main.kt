@@ -14,6 +14,7 @@ import java.awt.GridLayout
 import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 fun main() {
@@ -31,9 +32,11 @@ fun main() {
 
 class GUI : JFrame() {
 	init {
+		JFXPanel()
+
 		title = "Hummel009's Audio Master"
 		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(0, 0, 500, 186)
+		setBounds(0, 0, 550, 186)
 
 		val contentPanel = JPanel()
 		contentPanel.border = EmptyBorder(5, 5, 5, 5)
@@ -44,13 +47,13 @@ class GUI : JFrame() {
 		inputPanel.layout = GridLayout(0, 2, 5, 5)
 
 		inputPanel.add(JLabel("Длина записи (секунд):"))
-		val timeField = JTextField(20)
+		val timeField = JTextField(50)
 		timeField.text = "5"
 		inputPanel.add(timeField)
 
 		inputPanel.add(JLabel("Выбор файла:"))
-		val fileField = JTextField(20)
-		fileField.text = "C:\\Users\\Hummel009\\Downloads\\test.wav"
+		val fileField = JTextField(50)
+		fileField.text = "${System.getProperty("user.home")}\\Downloads\\test.wav"
 		inputPanel.add(fileField)
 
 		var sym = true
@@ -72,32 +75,46 @@ class GUI : JFrame() {
 
 		val recButton = JButton("Запись звука")
 		recButton.addActionListener {
-			val exePath =
-				"D:\\Source\\System-Programming\\CourseNative\\build\\bin\\native\\releaseExecutable\\CourseNative.exe"
-			val parameters = listOf(timeField.text, fileField.text)
+			val exePath = "CourseNative.exe"
+			val exeFile = File(exePath)
+			if (exeFile.exists()) {
+				thread {
+					val parameters = listOf(timeField.text, fileField.text)
 
-			val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
-			val process = processBuilder.start()
-			process.waitFor()
-			JOptionPane.showMessageDialog(
-				this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
-			)
+					val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
+					val process = processBuilder.start()
+					process.waitFor()
+					JOptionPane.showMessageDialog(
+						this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
+					)
+				}
+			} else {
+				JOptionPane.showMessageDialog(
+					this, "Файл отсутствует", "Error", JOptionPane.ERROR_MESSAGE
+				)
+			}
 		}
 
 		val visButton = JButton("Запуск визуализации")
 		visButton.addActionListener {
-			JFXPanel()
-			val app = App(if (sym) VisSym() else VisBar(), File(fileField.text))
-			Platform.runLater {
-				val stage = Stage()
-				stage.title = "Hummel009's Media Player"
-				stage.setScene(app.scene)
-				stage.show()
-				stage.setOnCloseRequest {
-					it.consume()
-					stage.hide()
-					exitProcess(0)
+			val wavFile = File(fileField.text)
+			if (wavFile.exists()) {
+				val app = App(if (sym) VisSym() else VisBar(), wavFile)
+				Platform.runLater {
+					val stage = Stage()
+					stage.title = "Hummel009's Media Player"
+					stage.setScene(app.scene)
+					stage.show()
+					stage.setOnCloseRequest {
+						it.consume()
+						stage.hide()
+						exitProcess(0)
+					}
 				}
+			} else {
+				JOptionPane.showMessageDialog(
+					this, "Файл отсутствует", "Error", JOptionPane.ERROR_MESSAGE
+				)
 			}
 		}
 

@@ -10,7 +10,7 @@ import platform.windows.*
 val log: MutableMap<String, String> = mutableMapOf()
 
 fun main(args: Array<String>) {
-	require(args.size == 2) { "Invalid arguments quantity" }
+	require(args.size == 2) { "Error: invalid arguments quantity!" }
 
 	val seconds = args[0].toUInt() * 1000u
 	val path = args[1]
@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
 			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), it)
 			fclose(it)
 		} ?: run {
-			println("Error opening file $path")
+			throw RuntimeException("Error: file does not exist!")
 		}
 
 		log.forEach { (key, value) -> println("$key: $value") }
