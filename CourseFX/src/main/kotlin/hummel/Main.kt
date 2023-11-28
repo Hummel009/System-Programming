@@ -101,7 +101,7 @@ class GUI : JFrame() {
 			}
 		}
 
-		val visButton = JButton("Запуск визуализации")
+		val visButton = JButton("Запуск визуализации и анализа")
 		visButton.addActionListener {
 			val wavFile = File(fileField.text)
 			if (wavFile.exists()) {
@@ -116,6 +116,14 @@ class GUI : JFrame() {
 						stage.hide()
 						exitProcess(0)
 					}
+				}
+				try {
+					val fft = FFT(wavFile)
+					fft.execute()
+				} catch (e: Exception) {
+					JOptionPane.showMessageDialog(
+						this, "Ошибка разложения Фурье", "Error", JOptionPane.ERROR_MESSAGE
+					)
 				}
 			} else {
 				JOptionPane.showMessageDialog(
