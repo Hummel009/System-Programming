@@ -3,6 +3,7 @@ package hummel
 import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatGitHubDarkIJTheme
 import hummel.app.App
+import hummel.app.FFT
 import hummel.app.VisBar
 import hummel.app.VisSym
 import javafx.application.Platform
@@ -36,25 +37,25 @@ class GUI : JFrame() {
 
 		title = "Hummel009's Audio Master"
 		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(0, 0, 550, 186)
+		setBounds(0, 0, 550, 225)
 
 		val contentPanel = JPanel()
 		contentPanel.border = EmptyBorder(5, 5, 5, 5)
 		contentPanel.layout = BorderLayout(0, 0)
 		contentPane = contentPanel
 
-		val inputPanel = JPanel()
-		inputPanel.layout = GridLayout(0, 2, 5, 5)
+		val twoColumnPanel = JPanel()
+		twoColumnPanel.layout = GridLayout(0, 2, 5, 5)
 
-		inputPanel.add(JLabel("Длина записи (секунд):"))
+		twoColumnPanel.add(JLabel("Длина записи (секунд):"))
 		val timeField = JTextField(50)
 		timeField.text = "5"
-		inputPanel.add(timeField)
+		twoColumnPanel.add(timeField)
 
-		inputPanel.add(JLabel("Выбор файла:"))
+		twoColumnPanel.add(JLabel("Выбор файла:"))
 		val fileField = JTextField(50)
 		fileField.text = "${System.getProperty("user.home")}\\Downloads\\test.wav"
-		inputPanel.add(fileField)
+		twoColumnPanel.add(fileField)
 
 		var sym = true
 		val radioSym = JRadioButton("Симметричная визуализация")
@@ -70,71 +71,91 @@ class GUI : JFrame() {
 			radioSym.isSelected = false
 			radioBar.isSelected = true
 		}
-		inputPanel.add(radioSym)
-		inputPanel.add(radioBar)
+		twoColumnPanel.add(radioSym)
+		twoColumnPanel.add(radioBar)
+
+		val oneColumnPanel = JPanel()
+		oneColumnPanel.layout = GridLayout(0, 1, 5, 5)
 
 		val recButton = JButton("Запись звука")
 		recButton.addActionListener {
-			val exePath = "CourseNative.exe"
-			val exeFile = File(exePath)
-			if (exeFile.exists()) {
-				thread {
+			thread {
+				val exeFilePath = "CourseNative.exe"
+				val exeFile = File(exeFilePath)
+				if (exeFile.exists()) {
 					val parameters = listOf(timeField.text, fileField.text)
-
-					val processBuilder = ProcessBuilder(exePath, *parameters.toTypedArray())
+					val processBuilder = ProcessBuilder(exeFilePath, *parameters.toTypedArray())
 					val process = processBuilder.start()
 					val result = process.waitFor()
 					if (result == 0) {
 						JOptionPane.showMessageDialog(
-							this, "Запись завершена", "Message", JOptionPane.INFORMATION_MESSAGE
+							this, "Запись завершена!", "Успех", JOptionPane.INFORMATION_MESSAGE
 						)
 					} else {
 						JOptionPane.showMessageDialog(
-							this, "Ошибка микрофона", "Error", JOptionPane.ERROR_MESSAGE
+							this, "Микрофон недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
 						)
 					}
-				}
-			} else {
-				JOptionPane.showMessageDialog(
-					this, "Файл отсутствует", "Error", JOptionPane.ERROR_MESSAGE
-				)
-			}
-		}
-
-		val visButton = JButton("Запуск визуализации и анализа")
-		visButton.addActionListener {
-			val wavFile = File(fileField.text)
-			if (wavFile.exists()) {
-				val app = App(if (sym) VisSym() else VisBar(), wavFile)
-				Platform.runLater {
-					val stage = Stage()
-					stage.title = "Hummel009's Media Player"
-					stage.setScene(app.scene)
-					stage.show()
-					stage.setOnCloseRequest {
-						it.consume()
-						stage.hide()
-						exitProcess(0)
-					}
-				}
-				try {
-					val fft = FFT(wavFile)
-					fft.execute()
-				} catch (e: Exception) {
+				} else {
 					JOptionPane.showMessageDialog(
-						this, "Ошибка разложения Фурье", "Error", JOptionPane.ERROR_MESSAGE
+						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
 					)
 				}
-			} else {
-				JOptionPane.showMessageDialog(
-					this, "Файл отсутствует", "Error", JOptionPane.ERROR_MESSAGE
-				)
 			}
 		}
+		oneColumnPanel.add(recButton)
 
-		contentPanel.add(inputPanel, BorderLayout.NORTH)
-		contentPanel.add(recButton, BorderLayout.CENTER)
-		contentPanel.add(visButton, BorderLayout.SOUTH)
+		val visButton = JButton("Запуск визуализации")
+		visButton.addActionListener {
+			thread {
+				val wavFilePath = fileField.text
+				val wavFile = File(wavFilePath)
+				if (wavFile.exists()) {
+					val app = App(if (sym) VisSym() else VisBar(), wavFile)
+					Platform.runLater {
+						val stage = Stage()
+						stage.title = "Hummel009's Media Player"
+						stage.setScene(app.scene)
+						stage.show()
+						stage.setOnCloseRequest {
+							it.consume()
+							stage.hide()
+							exitProcess(0)
+						}
+					}
+				} else {
+					JOptionPane.showMessageDialog(
+						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+					)
+				}
+			}
+		}
+		oneColumnPanel.add(visButton)
+
+		val fftButton = JButton("Запуск анализа")
+		fftButton.addActionListener {
+			thread {
+				val wavFile = File(fileField.text)
+				if (wavFile.exists()) {
+					try {
+						val fft = FFT(wavFile)
+						fft.execute()
+					} catch (e: Exception) {
+						JOptionPane.showMessageDialog(
+							this, "Разложение недоступно!", "Ошибка", JOptionPane.ERROR_MESSAGE
+						)
+					}
+				} else {
+					JOptionPane.showMessageDialog(
+						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+					)
+				}
+			}
+		}
+		oneColumnPanel.add(fftButton)
+
+		contentPanel.add(twoColumnPanel, BorderLayout.NORTH)
+		contentPanel.add(oneColumnPanel, BorderLayout.SOUTH)
 
 		setLocationRelativeTo(null)
 	}

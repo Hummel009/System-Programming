@@ -1,4 +1,4 @@
-package hummel
+package hummel.app
 
 import java.io.File
 import java.io.FileInputStream
@@ -105,21 +105,32 @@ class FFT(private var wavFile: File) {
 	}
 
 	private fun basicFFT(n: Int, rex: DoubleArray, imx: DoubleArray) {
+		var k: Int
+		var tr: Double
+		var ti: Double
+		var le: Int
+		var le2: Int
+		var ur: Double
+		var ui: Double
+		var sr: Double
+		var si: Double
+		var jm1: Int
+		var ip: Int
+
 		//Set constants
 		val pi = Math.PI //1050
 		val nm1 = n - 1 //1060
 		val nd2 = n / 2 //1070
 		val m = log2(n.toDouble()).toInt() //1080
 		var j = nd2 //1090
-		var k: Int
 
 		//Bit reversal sorting
 		class GoTo1190 : Exception()
 		nextI@ for (i in 1 until n - 1) { //1110
 			try {
 				if (i >= j) throw GoTo1190() //1120
-				val tr = rex[j] //1130
-				val ti = imx[j] //1140
+				tr = rex[j] //1130
+				ti = imx[j] //1140
 				rex[j] = rex[i] //1150
 				imx[j] = imx[i] //1160
 				rex[i] = tr //1170
@@ -138,31 +149,31 @@ class FFT(private var wavFile: File) {
 
 		//Loop for each stage
 		for (l in 1..m) { //1270
-			val le = (2.0.pow(l)).toInt() //1280
-			val le2 = le / 2 //1290
-			var ur = 1.0 //1300
-			var ui = 0.0 //1310
+			le = (2.0.pow(l)).toInt() //1280
+			le2 = le / 2 //1290
+			ur = 1.0 //1300
+			ui = 0.0 //1310
 
 			//Calculate sine & cosine values
-			val sr = cos(pi / le2) //1320
-			val si = -sin(pi / le2) //1330
+			sr = cos(pi / le2) //1320
+			si = -sin(pi / le2) //1330
 
 			for (jShad in 1..le2) { //1340
-				val jm1 = jShad - 1 //1350
+				jm1 = jShad - 1 //1350
 
 				//Loop for each butterfly
 				for (i in jm1..nm1 step le) { //1360
-					val ip = i + le2 //1370
+					ip = i + le2 //1370
 
 					//Butterfly calculation
-					val tr = rex[ip] * ur - imx[ip] * ui //1380
-					val ti = rex[ip] * ui + imx[ip] * ur //1390
+					tr = rex[ip] * ur - imx[ip] * ui //1380
+					ti = rex[ip] * ui + imx[ip] * ur //1390
 					rex[ip] = rex[i] - tr //1400
 					imx[ip] = imx[i] - ti //1410
 					rex[i] = rex[i] + tr //1420
 					imx[i] = imx[i] + ti //1430
 				}
-				val tr = ur //1450
+				tr = ur //1450
 				ur = tr * sr - ui * si //1460
 				ui = tr * si + ui * sr //1470
 			}
