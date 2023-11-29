@@ -105,7 +105,7 @@ class GUI : JFrame() {
 		}
 		oneColumnPanel.add(recButton)
 
-		val visButton = JButton("Запуск визуализации")
+		val visButton = JButton("Визуализация звука")
 		visButton.addActionListener {
 			thread {
 				val wavFilePath = fileField.text
@@ -132,7 +132,7 @@ class GUI : JFrame() {
 		}
 		oneColumnPanel.add(visButton)
 
-		val fftButton = JButton("Запуск анализа")
+		val fftButton = JButton("Преобразование Фурье")
 		fftButton.addActionListener {
 			thread {
 				val wavFilePath = fileField.text
@@ -141,9 +141,12 @@ class GUI : JFrame() {
 					try {
 						val fft = FourierTransform(wavFile)
 						fft.execute()
+						JOptionPane.showMessageDialog(
+							this, "Преобразование завершено!", "Успех", JOptionPane.INFORMATION_MESSAGE
+						)
 					} catch (e: Exception) {
 						JOptionPane.showMessageDialog(
-							this, "Разложение недоступно!", "Ошибка", JOptionPane.ERROR_MESSAGE
+							this, "Преобразование недоступно!", "Ошибка", JOptionPane.ERROR_MESSAGE
 						)
 					}
 				} else {

@@ -11,14 +11,14 @@ import kotlin.system.exitProcess
 val log: MutableMap<String, String> = mutableMapOf()
 
 fun main(args: Array<String>) {
-	require(args.size == 2) { "Error: invalid arguments quantity!" }
+	require(args.size == 2) { "Ошибка: неверные аргументы!" }
 
 	val seconds = args[0].toUInt() * 1000u
 	val path = args[1]
 
 	memScoped {
 		val devices = waveInGetNumDevs()
-		println("There are $devices microphones.")
+		println("Доступно следующее количество микрофонов: $devices.")
 
 		val hwi = alloc<HWAVEINVar>()
 		val wfx = alloc<WAVEFORMATEX>()
@@ -43,7 +43,7 @@ fun main(args: Array<String>) {
 		"waveInAddBuffer" to waveInAddBuffer(hwi.value, wh.ptr, sizeOf<WAVEHDR>().toUInt())
 		"waveInStart" to waveInStart(hwi.value)
 
-		println("Recording started!")
+		println("Запись начата!")
 
 		Sleep(seconds)
 
@@ -57,12 +57,12 @@ fun main(args: Array<String>) {
 			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), it)
 			fclose(it)
 		} ?: run {
-			throw RuntimeException("Error: file does not exist!")
+			throw RuntimeException("Ошибка: файл недоступен!")
 		}
 
 		log.forEach { (key, value) -> println("$key: $value") }
 
-		println("Recorded: ${wh.dwBytesRecorded / 1000u} kbytes")
+		println("Записано: ${wh.dwBytesRecorded / 1000u} килобайт")
 
 		if (log.entries.any { it.value != "OK" }) {
 			exitProcess(1)
