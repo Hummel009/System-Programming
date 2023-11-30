@@ -22,9 +22,8 @@ fun launchTask3() {
 	thread { lists?.flatten()?.mergeSort()?.forEach { print("$it ") } }
 }
 
-private fun List<String>.chunk(executors: Int): List<List<String>> {
-	return chunked(size / executors + if (size % executors == 0) 0 else 1)
-}
+private fun List<String>.chunk(executors: Int): List<List<String>> =
+	chunked(size / executors + if (size % executors == 0) 0 else 1)
 
 private fun List<String>.mergeSort(): List<String> {
 	fun mergeStrings(left: List<String>, right: List<String>): List<String> {

@@ -17,7 +17,7 @@ fun main() {
 		dwFlag[0] = 0u
 
 		val thread = nativeHeap.alloc<pthread_tVar>()
-		pthread_create(thread.ptr, null, staticCFunction(::threadFunction), null)
+		pthread_create(thread.ptr, null, staticCFunction { it -> threadFunction(it) }, null)
 
 		val hKey = alloc<HKEYVar>()
 		val data = "AMOGUS"
@@ -54,6 +54,7 @@ fun main() {
 	}
 }
 
+@Suppress("UNUSED_PARAMETER")
 fun threadFunction(arg: COpaquePointer?): CPointer<*>? {
 	memScoped {
 		val hKey = alloc<HKEYVar>()
@@ -75,7 +76,7 @@ fun threadFunction(arg: COpaquePointer?): CPointer<*>? {
 }
 
 private infix fun String.to(signal: Int) {
-	log[this] = if (signal == ERROR_SUCCESS) "OK" else signal.toString()
+	log[this] = if (signal == ERROR_SUCCESS) "OK" else "$signal"
 }
 
 private fun String.sizeOf(): DWORD = cstr.size.toUInt()

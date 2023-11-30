@@ -256,9 +256,7 @@ private fun clearAndUpdate(hwnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
 	ExUser32.INSTANCE.InvalidateRect(hwnd, null, true)
 }
 
-private fun Color.toDword(): DWORD {
-	return DWORD((blue shl 16 or (green shl 8) or red).toLong())
-}
+private fun Color.toDword(): DWORD = DWORD((blue shl 16 or (green shl 8) or red).toLong())
 
 enum class HotKeys {
 	Z, X, C

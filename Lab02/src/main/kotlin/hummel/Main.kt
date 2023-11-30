@@ -43,14 +43,14 @@ fun main() {
 				}
 			}
 			val frame = JFrame("Window Launcher")
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+			frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
 			frame.setSize(350, 150)
 			val button1 = JButton("Launch: Table with the text")
 			button1.addActionListener { launchTable() }
 			val button2 = JButton("Launch: Circle with the text")
 			button2.addActionListener { launchCircle() }
 			val panel = JPanel()
-			panel.setLayout(FlowLayout())
+			panel.layout = FlowLayout()
 			panel.add(button1)
 			panel.add(button2)
 			frame.add(panel)
@@ -206,17 +206,17 @@ private fun redrawCircle(hdc: HDC?) {
 		var x = cX + r1 * cos(temp)
 		var y = cY + r1 * sin(temp)
 
-		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		x = cX + r2 * cos(temp)
 		y = cY + r2 * sin(temp)
 
-		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		x = cX + r3 * cos(temp)
 		y = cY + r3 * sin(temp)
 
-		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), text[i].toString(), 1)
+		ExGDI32.INSTANCE.TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		angle += (360 / textLength - if (angle >= 360) 360 else 0) + 0.5
 
