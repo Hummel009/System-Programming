@@ -2,7 +2,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.jetbrains.kotlin.multiplatform") version "1.9.20"
+	id("org.jetbrains.kotlin.multiplatform") version "1.9.21"
 	id("idea")
 }
 
@@ -15,7 +15,7 @@ repositories {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
