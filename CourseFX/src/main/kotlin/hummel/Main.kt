@@ -12,6 +12,8 @@ import javafx.stage.Stage
 import java.awt.BorderLayout
 import java.awt.EventQueue
 import java.awt.GridLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
@@ -32,6 +34,8 @@ fun main() {
 }
 
 class GUI : JFrame() {
+	var frame: GUI = this
+
 	init {
 		JFXPanel()
 
@@ -55,6 +59,16 @@ class GUI : JFrame() {
 		twoColumnPanel.add(JLabel("Выбор файла:"))
 		val fileField = JTextField(50)
 		fileField.text = "${System.getProperty("user.home")}\\Downloads\\test.wav"
+		fileField.isEnabled = false
+		fileField.addMouseListener(object : MouseAdapter() {
+			override fun mouseClicked(e: MouseEvent) {
+				val fileChooser = JFileChooser()
+				val result = fileChooser.showOpenDialog(frame)
+				if (result == JFileChooser.APPROVE_OPTION) {
+					fileField.text = fileChooser.selectedFile.absolutePath
+				}
+			}
+		})
 		twoColumnPanel.add(fileField)
 
 		var sym = true
