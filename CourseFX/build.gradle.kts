@@ -15,8 +15,8 @@ repositories {
 }
 
 dependencies {
-	implementation("com.formdev:flatlaf:3.2.1")
-	implementation("com.formdev:flatlaf-intellij-themes:3.2.1")
+	implementation("com.formdev:flatlaf:3.2.5")
+	implementation("com.formdev:flatlaf-intellij-themes:3.2.5")
 	implementation("com.tambapps.fft4j:fft4j:2.0")
 }
 
