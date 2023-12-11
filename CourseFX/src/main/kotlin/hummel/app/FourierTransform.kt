@@ -6,7 +6,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.*
 
-
 class FourierTransform(private var wavFile: File) {
 	fun execute() {
 		val samples = getSamplesFromFile()
