@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 	repositories {
 		google()
 		mavenCentral()
@@ -20,4 +20,4 @@ include(":appLab2")
 include(":appLab4")
 include(":appLab5")
 include(":appCourse")
-//include(":appCourseMP")
+include(":appCourseMP")
