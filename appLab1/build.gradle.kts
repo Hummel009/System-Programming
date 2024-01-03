@@ -2,22 +2,12 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.jetbrains.kotlin.jvm")
-	id("application")
+	id("org.jetbrains.kotlin.multiplatform")
+	id("idea")
 }
 
 group = "hummel"
 version = "v" + LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
-
-val embed: Configuration by configurations.creating
-
-dependencies {
-	embed("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
-	embed("net.java.dev.jna:jna:5.13.0")
-	embed("net.java.dev.jna:jna-platform:5.13.0")
-	implementation("net.java.dev.jna:jna:5.13.0")
-	implementation("net.java.dev.jna:jna-platform:5.13.0")
-}
 
 java {
 	toolchain {
@@ -25,25 +15,21 @@ java {
 	}
 }
 
-application {
-	mainClass = "hummel.MainKt"
-}
-
-tasks {
-	named<JavaExec>("run") {
-		standardInput = System.`in`
-	}
-	jar {
-		manifest {
-			attributes(
-				mapOf(
-					"Main-Class" to "hummel.MainKt"
-				)
-			)
+kotlin {
+	mingwX64 {
+		binaries {
+			executable {
+				entryPoint("hummel.main")
+				linkerOpts("-lwinmm")
+				baseName = "${project.name}-${project.version}"
+			}
 		}
-		from(embed.map {
-			if (it.isDirectory) it else zipTree(it)
-		})
-		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	}
+	sourceSets {
+		configureEach {
+			languageSettings {
+				optIn("kotlinx.cinterop.ExperimentalForeignApi")
+			}
+		}
 	}
 }
