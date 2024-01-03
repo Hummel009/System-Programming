@@ -22,48 +22,6 @@ fun main() {
 	rc.right = 30
 	rc.bottom = 30
 
-	val wc = WNDCLASSEX()
-	wc.hInstance = null
-	wc.lpszClassName = className
-	wc.lpfnWndProc = WindowProc { hWnd, uMsg, wParam, lParam ->
-		val ps = ExUser32.PAINTSTRUCT()
-		when (uMsg) {
-			WM_DESTROY -> {
-				ExUser32.INSTANCE.PostQuitMessage(0)
-				LRESULT(0)
-			}
-
-			WM_SESSION_CHANGE -> {
-				LRESULT(0)
-			}
-
-			WM_PAINT -> {
-				val hdc = ExUser32.INSTANCE.BeginPaint(hWnd, ps)
-				val brush = ExGDI32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
-
-				ExUser32.INSTANCE.FillRect(hdc, rc, brush)
-				ExUser32.INSTANCE.EndPaint(hWnd, ps)
-				LRESULT(0)
-			}
-
-			else -> ExUser32.INSTANCE.DefWindowProc(hWnd, uMsg, wParam, lParam)
-		}
-	}
-
-	ExUser32.INSTANCE.RegisterClassEx(wc)
-
-	val width = 1280
-	val height = 720
-	val hWnd = createWindowInCenter(className, windowTitle, width, height)
-
-	ExUser32.INSTANCE.ShowWindow(hWnd, SW_SHOW)
-	ExUser32.INSTANCE.UpdateWindow(hWnd)
-
-	for (key in HotKeys.entries) {
-		ExUser32.INSTANCE.RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
-	}
-
-	val msg = MSG()
 	var speedX = 10
 	var speedY = 10
 	var reverseX = false
@@ -73,17 +31,23 @@ fun main() {
 	var iter = 0
 	var isSnakeMode = false
 	var isMousePressed = false
-	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
-		ExUser32.INSTANCE.TranslateMessage(msg)
-		ExUser32.INSTANCE.DispatchMessage(msg)
+
+	val width = 1280
+	val height = 720
+
+	val wc = WNDCLASSEX()
+	wc.hInstance = null
+	wc.lpszClassName = className
+	wc.lpfnWndProc = WindowProc { hWnd, uMsg, wParam, lParam ->
+		val ps = ExUser32.PAINTSTRUCT()
 
 		val reverse = reverseX || reverseY
 		var movedViaKeyboard = false
 
-		when (msg.message) {
+		when (uMsg) {
 			WM_KEYDOWN -> {
 				clearAndUpdate(hWnd, rc, isSnakeMode)
-				when (msg.wParam.toInt()) {
+				when (wParam.toInt()) {
 					KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
 						rc.left -= speedX
 						rc.right -= speedX
@@ -123,8 +87,7 @@ fun main() {
 			}
 
 			WM_HOTKEY -> {
-				when (msg.wParam.toInt()) {
-					HotKeys.X.ordinal -> break@loop
+				when (wParam.toInt()) {
 					HotKeys.Z.ordinal -> isSnakeMode = true
 					HotKeys.C.ordinal -> {
 						speedX *= 2
@@ -134,8 +97,8 @@ fun main() {
 			}
 
 			WM_MOUSEMOVE -> {
-				mouseX = msg.lParam.toInt() and 0xFFFF
-				mouseY = (msg.lParam.toInt() shr 16) and 0xFFFF
+				mouseX = lParam.toInt() and 0xFFFF
+				mouseY = (lParam.toInt() shr 16) and 0xFFFF
 			}
 
 			WM_LBUTTONDOWN -> {
@@ -148,7 +111,7 @@ fun main() {
 
 			WM_MOUSEWHEEL -> {
 				clearAndUpdate(hWnd, rc, isSnakeMode)
-				val wheelDelta = (msg.wParam.toInt() shr 16)
+				val wheelDelta = (wParam.toInt() shr 16)
 				val isShiftPressed =
 					(ExUser32.INSTANCE.GetKeyState(KeyEvent.VK_SHIFT) and 0x8000.toShort()).toInt() != 0
 				if (isShiftPressed) {
@@ -169,6 +132,24 @@ fun main() {
 					}
 				}
 				movedViaKeyboard = true
+			}
+
+			WM_DESTROY -> {
+				ExUser32.INSTANCE.PostQuitMessage(0)
+				LRESULT(0)
+			}
+
+			WM_SESSION_CHANGE -> {
+				LRESULT(0)
+			}
+
+			WM_PAINT -> {
+				val hdc = ExUser32.INSTANCE.BeginPaint(hWnd, ps)
+				val brush = ExGDI32.INSTANCE.CreateSolidBrush(Color.RED.toDword())
+
+				ExUser32.INSTANCE.FillRect(hdc, rc, brush)
+				ExUser32.INSTANCE.EndPaint(hWnd, ps)
+				LRESULT(0)
 			}
 		}
 
@@ -231,6 +212,25 @@ fun main() {
 				iter = 0
 			}
 		}
+
+		ExUser32.INSTANCE.DefWindowProc(hWnd, uMsg, wParam, lParam)
+	}
+
+	ExUser32.INSTANCE.RegisterClassEx(wc)
+
+	val hWnd = createWindowInCenter(className, windowTitle, width, height)
+
+	ExUser32.INSTANCE.ShowWindow(hWnd, SW_SHOW)
+	ExUser32.INSTANCE.UpdateWindow(hWnd)
+
+	for (key in HotKeys.entries) {
+		ExUser32.INSTANCE.RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL, (key.name[0]).code)
+	}
+
+	val msg = MSG()
+	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
+		ExUser32.INSTANCE.TranslateMessage(msg)
+		ExUser32.INSTANCE.DispatchMessage(msg)
 	}
 }
 
