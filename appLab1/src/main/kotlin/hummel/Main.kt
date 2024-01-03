@@ -228,7 +228,7 @@ fun main() {
 	}
 
 	val msg = MSG()
-	loop@ while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
+	while (ExUser32.INSTANCE.GetMessage(msg, null, 0, 0) != 0) {
 		ExUser32.INSTANCE.TranslateMessage(msg)
 		ExUser32.INSTANCE.DispatchMessage(msg)
 	}
