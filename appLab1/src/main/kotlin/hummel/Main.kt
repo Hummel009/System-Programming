@@ -88,6 +88,7 @@ fun main() {
 
 			WM_HOTKEY -> {
 				when (wParam.toInt()) {
+					HotKeys.X.ordinal -> ExUser32.INSTANCE.PostQuitMessage(0)
 					HotKeys.Z.ordinal -> isSnakeMode = true
 					HotKeys.C.ordinal -> {
 						speedX *= 2
