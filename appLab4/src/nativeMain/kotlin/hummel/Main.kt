@@ -1,78 +1,101 @@
 package hummel
 
 import kotlinx.cinterop.*
-import platform.posix.*
 import platform.windows.*
 
 val log: MutableMap<String, String> = mutableMapOf()
 
+const val name: String = "Hummel009"
+const val path: String = "Software\\RegistrySample\\"
+var changed: Boolean = false
+
 fun main() {
-	memScoped {
-		val name = "Hummel009"
-		val path = "Software\\RegistrySample\\"
-		val szBuf = allocArray<CHARVar>(MAX_PATH)
-		val dwBufLen = allocArray<DWORDVar>(1)
-		dwBufLen[0] = MAX_PATH.toUInt()
-		val dwFlag = allocArray<DWORDVar>(1)
-		dwFlag[0] = 0u
+	val threadOperate = CreateThread(
+		null, 0u, staticCFunction(::threadOperate), null, 0u, null
+	)
 
-		val thread = nativeHeap.alloc<pthread_tVar>()
-		pthread_create(thread.ptr, null, staticCFunction { it -> threadFunction(it) }, null)
+	val threadNotify = CreateThread(
+		null, 0u, staticCFunction(::threadNotify), null, 0u, null
+	)
 
-		val hKey = alloc<HKEYVar>()
-		val data = "AMOGUS"
+	WaitForSingleObject(threadOperate, INFINITE)
+	WaitForSingleObject(threadNotify, INFINITE)
 
-		"Create Key" to RegCreateKeyExA(
-			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, hKey.ptr, null
-		)
-		"Set Value" to RegSetValueExA(hKey.value, name, 0u, REG_SZ.toUInt(), data.ptr(), data.sizeOf())
-		val file = fopen("registryBackup.reg", "w")
-		fprintf(file, "%s\n", data)
-		fclose(file)
-		"Close Key" to RegCloseKey(hKey.value)
-		"Get Value" to RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, szBuf, dwBufLen)
+	CloseHandle(threadOperate)
+	CloseHandle(threadNotify)
 
-		println(szBuf.toKString())
+	println("Call results:\n")
+	log.forEach { (key, value) -> println("$key: $value") }
 
-		val hKeyRe = alloc<HKEYVar>()
-		val replace = "SUS"
+	println()
 
-		"Open Key Again" to RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), hKeyRe.ptr)
-		"Set New Value" to RegSetValueExA(hKeyRe.value, name, 0u, REG_SZ.toUInt(), replace.ptr(), replace.sizeOf())
-		"Close Key Again" to RegCloseKey(hKeyRe.value)
-		"Get New Value" to RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), dwFlag, szBuf, dwBufLen)
-
-		println(szBuf.toKString())
-		println("Flag: ${dwFlag[0]}")
-
-		"Delete Key" to RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
-
-		log.forEach { (key, value) -> println("$key: $value") }
-
-		pthread_join(thread.value, null)
-		nativeHeap.free(thread)
+	if (changed) {
+		println("The key was changed!")
+	} else {
+		println("The key wasn't changed!")
 	}
 }
 
 @Suppress("UNUSED_PARAMETER")
-fun threadFunction(arg: COpaquePointer?): CPointer<*>? {
+fun threadNotify(lpParameter: LPVOID?): DWORD {
 	memScoped {
-		val hKey = alloc<HKEYVar>()
+		val key = alloc<HKEYVar>()
 
-		"Open Key For Monitoring" to RegOpenKeyExA(
-			HKEY_CURRENT_USER, "Software\\RegistrySample", 0u, KEY_NOTIFY.toUInt(), hKey.ptr
+		"Open Key For Monitoring" to RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_NOTIFY.toUInt(), key.ptr)
+
+		val event = CreateEventA(null, 1, 0, null)
+
+		RegNotifyChangeKeyValue(key.value, 1, REG_NOTIFY_CHANGE_LAST_SET.toUInt(), event, 1)
+
+		if (WaitForSingleObject(event, INFINITE) == WAIT_OBJECT_0) {
+			changed = true
+		}
+		ResetEvent(event)
+	}
+	return 0u
+}
+
+@Suppress("UNUSED_PARAMETER")
+fun threadOperate(lpParameter: LPVOID?): DWORD {
+	memScoped {
+		Sleep(1000u)
+
+		val buffer = allocArray<CHARVar>(MAX_PATH)
+
+		val bufferLength = allocArray<DWORDVar>(1)
+		bufferLength[0] = MAX_PATH.toUInt()
+
+		val key = alloc<HKEYVar>()
+		val keyValue = "AMOGUS"
+
+		"Create Key" to RegCreateKeyExA(
+			HKEY_CURRENT_USER, path, 0u, null, REG_OPTION_VOLATILE.toUInt(), KEY_WRITE.toUInt(), null, key.ptr, null
+		)
+		"Set Value" to RegSetValueExA(key.value, name, 0u, REG_SZ.toUInt(), keyValue.ptr(), keyValue.sizeOf())
+		"Close Key" to RegCloseKey(key.value)
+		"Get Value" to RegGetValueA(HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, buffer, bufferLength)
+
+		println("Initial value: ${buffer.toKString()}")
+
+		val newKey = alloc<HKEYVar>()
+		val newKeyValue = "SUS"
+
+		"Open Key Again" to RegOpenKeyExA(HKEY_CURRENT_USER, path, 0u, KEY_SET_VALUE.toUInt(), newKey.ptr)
+		"Set New Value" to RegSetValueExA(
+			newKey.value, name, 0u, REG_SZ.toUInt(), newKeyValue.ptr(), newKeyValue.sizeOf()
+		)
+		"Close Key Again" to RegCloseKey(newKey.value)
+		"Get New Value" to RegGetValueA(
+			HKEY_CURRENT_USER, path, name, RRF_RT_REG_SZ.toUInt(), null, buffer, bufferLength
 		)
 
-		val hEvent = CreateEventA(null, 1, 0, null)
+		println("New value: ${buffer.toKString()}")
 
-		RegNotifyChangeKeyValue(hKey.value, 1, REG_NOTIFY_CHANGE_LAST_SET.toUInt(), hEvent, 1)
+		"Delete Key" to RegDeleteKeyValueA(HKEY_CURRENT_USER, path, name)
 
-		if (WaitForSingleObject(hEvent, INFINITE) == WAIT_OBJECT_0) {
-			println("CHANGED")
-		}
-		ResetEvent(hEvent)
+		println()
 	}
-	return null
+	return 0u
 }
 
 private infix fun String.to(signal: Int) {
