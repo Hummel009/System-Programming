@@ -20,37 +20,37 @@ var reverseX: Boolean = false
 var reverseY: Boolean = false
 var mouseX: Int = 0
 var mouseY: Int = 0
-var iter: Int = 0
-var isSnakeMode: Boolean = false
-var isMousePressed: Boolean = false
+var count: Int = 0
+var snakeMode: Boolean = false
+var mousePressed: Boolean = false
 
-lateinit var rc: RECT
+lateinit var square: RECT
 
 fun main() {
 	memScoped {
 		val className = "RenderingRectangle"
-		val windowTitle = "Windows API: Kotlin + JNA"
+		val windowTitle = "Windows API: Kotlin Native"
 
-		rc = alloc<RECT>()
-		rc.left = 10
-		rc.top = 10
-		rc.right = 30
-		rc.bottom = 30
+		square = alloc<RECT>()
+		square.left = 10
+		square.top = 10
+		square.right = 30
+		square.bottom = 30
 
-		val wc = alloc<WNDCLASS>()
-		wc.hCursor = LoadCursorW(null, IDC_ARROW)
-		wc.lpfnWndProc = staticCFunction(::wndProc)
-		wc.cbClsExtra = 0
-		wc.cbWndExtra = 0
-		wc.hInstance = null
-		wc.hIcon = null
-		wc.lpszMenuName = null
-		wc.lpszClassName = className.wcstr.ptr
-		wc.style = 0u
+		val windowClass = alloc<WNDCLASS>()
+		windowClass.hCursor = LoadCursorW(null, IDC_ARROW)
+		windowClass.lpfnWndProc = staticCFunction(::wndProc)
+		windowClass.cbClsExtra = 0
+		windowClass.cbWndExtra = 0
+		windowClass.hInstance = null
+		windowClass.hIcon = null
+		windowClass.lpszMenuName = null
+		windowClass.lpszClassName = className.wcstr.ptr
+		windowClass.style = 0u
 
-		RegisterClassW(wc.ptr)
+		RegisterClassW(windowClass.ptr)
 
-		val hWnd = CreateWindowExW(
+		val window = CreateWindowExW(
 			WS_EX_CLIENTEDGE.toUInt(),
 			className,
 			windowTitle,
@@ -65,11 +65,11 @@ fun main() {
 			null
 		)
 
-		ShowWindow(hWnd, SW_SHOW)
-		UpdateWindow(hWnd)
+		ShowWindow(window, SW_SHOW)
+		UpdateWindow(window)
 
 		for (key in HotKeys.entries) {
-			RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL.toUInt(), key.name[0].code.toUInt())
+			RegisterHotKey(window, key.ordinal, MOD_CONTROL.toUInt(), key.name[0].code.toUInt())
 		}
 
 		val msg = alloc<MSG>()
@@ -79,65 +79,65 @@ fun main() {
 		}
 
 		for (key in HotKeys.entries) {
-			UnregisterHotKey(hWnd, key.ordinal)
+			UnregisterHotKey(window, key.ordinal)
 		}
 	}
 }
 
-private fun clearAndUpdate(hWnd: HWND?, squareRect: RECT, snakeMode: Boolean) {
+private fun clearAndUpdate(window: HWND?, square: RECT, snakeMode: Boolean) {
 	if (!snakeMode) {
-		val hdc = GetDC(hWnd)
-		val whiteBrush = CreateSolidBrush(rgbWhite)
-		FillRect(hdc, squareRect.ptr, whiteBrush)
-		ReleaseDC(hWnd, hdc)
+		val deviceContext = GetDC(window)
+		val brush = CreateSolidBrush(rgbWhite)
+		FillRect(deviceContext, square.ptr, brush)
+		ReleaseDC(window, deviceContext)
 	}
-	InvalidateRect(hWnd, null, 1)
+	InvalidateRect(window, null, 1)
 }
 
-private fun wndProc(hWnd: HWND?, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
+private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
 	memScoped {
-		val ps = alloc<PAINTSTRUCT>()
+		val paintStructure = alloc<PAINTSTRUCT>()
 
 		val reverse = reverseX || reverseY
 		var movedViaKeyboard = false
 
-		when (uMsg.toInt()) {
+		when (msg.toInt()) {
 			WM_KEYDOWN -> {
-				clearAndUpdate(hWnd, rc, isSnakeMode)
+				clearAndUpdate(window, square, snakeMode)
 				when (wParam.toInt()) {
 					VK_LEFT, VK_A -> {
-						rc.left -= speedX
-						rc.right -= speedX
+						square.left -= speedX
+						square.right -= speedX
 						movedViaKeyboard = true
 						if (reverse) {
-							iter++
+							count++
 						}
 					}
 
 					VK_RIGHT, VK_D -> {
-						rc.left += speedX
-						rc.right += speedX
+						square.left += speedX
+						square.right += speedX
 						movedViaKeyboard = true
 						if (reverse) {
-							iter++
+							count++
 						}
 					}
 
 					VK_UP, VK_W -> {
-						rc.top -= speedY
-						rc.bottom -= speedY
+						square.top -= speedY
+						square.bottom -= speedY
 						movedViaKeyboard = true
 						if (reverse) {
-							iter++
+							count++
 						}
 					}
 
 					VK_DOWN, VK_S -> {
-						rc.top += speedY
-						rc.bottom += speedY
+						square.top += speedY
+						square.bottom += speedY
 						movedViaKeyboard = true
 						if (reverse) {
-							iter++
+							count++
 						}
 					}
 				}
@@ -146,7 +146,7 @@ private fun wndProc(hWnd: HWND?, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LR
 			WM_HOTKEY -> {
 				when (wParam.toInt()) {
 					HotKeys.X.ordinal -> PostQuitMessage(0)
-					HotKeys.Z.ordinal -> isSnakeMode = true
+					HotKeys.Z.ordinal -> snakeMode = true
 					HotKeys.C.ordinal -> {
 						speedX *= 2
 						speedY *= 2
@@ -159,111 +159,107 @@ private fun wndProc(hWnd: HWND?, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LR
 				mouseY = (lParam.toInt() shr 16) and 0xFFFF
 			}
 
-			WM_LBUTTONDOWN -> {
-				isMousePressed = true
-			}
-
-			WM_LBUTTONUP -> {
-				isMousePressed = false
+			WM_LBUTTONDOWN, WM_LBUTTONUP -> {
+				mousePressed = true
 			}
 
 			WM_MOUSEWHEEL -> {
-				clearAndUpdate(hWnd, rc, isSnakeMode)
+				clearAndUpdate(window, square, snakeMode)
 				val wheelDelta = (wParam.toInt() shr 16)
 				val isShiftPressed = (GetKeyState(VK_SHIFT).toInt() and 0x8000) != 0
 				if (isShiftPressed) {
 					if (wheelDelta > 0) {
-						rc.left -= speedX
-						rc.right -= speedX
+						square.left -= speedX
+						square.right -= speedX
 					} else {
-						rc.left += speedX
-						rc.right += speedX
+						square.left += speedX
+						square.right += speedX
 					}
 				} else {
 					if (wheelDelta > 0) {
-						rc.top -= speedY
-						rc.bottom -= speedY
+						square.top -= speedY
+						square.bottom -= speedY
 					} else {
-						rc.top += speedY
-						rc.bottom += speedY
+						square.top += speedY
+						square.bottom += speedY
 					}
 				}
 				movedViaKeyboard = true
 			}
 
-			WM_CLOSE -> DestroyWindow(hWnd)
+			WM_CLOSE -> DestroyWindow(window)
 			WM_DESTROY -> PostQuitMessage(0)
 
 			WM_PAINT -> {
-				val hdc = BeginPaint(hWnd, ps.ptr)
+				val deviceContext = BeginPaint(window, paintStructure.ptr)
 				val brush = CreateSolidBrush(rgbRed)
 
-				FillRect(hdc, rc.ptr, brush)
-				EndPaint(hWnd, ps.ptr)
+				FillRect(deviceContext, square.ptr, brush)
+				EndPaint(window, paintStructure.ptr)
 			}
 		}
 
-		if (isMousePressed) {
-			clearAndUpdate(hWnd, rc, isSnakeMode)
-			if (mouseX > rc.left) {
-				rc.left += speedX
-				rc.right += speedX
+		if (mousePressed) {
+			clearAndUpdate(window, square, snakeMode)
+			if (mouseX > square.left) {
+				square.left += speedX
+				square.right += speedX
 			}
-			if (mouseX < rc.left) {
-				rc.left -= speedX
-				rc.right -= speedX
+			if (mouseX < square.left) {
+				square.left -= speedX
+				square.right -= speedX
 			}
-			if (mouseY > rc.bottom) {
-				rc.bottom += speedY
-				rc.top += speedY
+			if (mouseY > square.bottom) {
+				square.bottom += speedY
+				square.top += speedY
 			}
-			if (mouseY < rc.bottom) {
-				rc.bottom -= speedY
-				rc.top -= speedY
+			if (mouseY < square.bottom) {
+				square.bottom -= speedY
+				square.top -= speedY
 			}
 		}
 
 		if (movedViaKeyboard) {
-			if (rc.left < 0) {
-				rc.right -= rc.left
-				rc.left = 0
+			if (square.left < 0) {
+				square.right -= square.left
+				square.left = 0
 				speedX *= -1
 				reverseX = true
 			}
-			if (rc.right > (width - 18)) {
-				rc.left -= rc.right - (width - 18)
-				rc.right = (width - 18)
+			if (square.right > (width - 18)) {
+				square.left -= square.right - (width - 18)
+				square.right = (width - 18)
 				speedX *= -1
 				reverseX = true
 			}
-			if (rc.top < 0) {
-				rc.bottom -= rc.top
-				rc.top = 0
+			if (square.top < 0) {
+				square.bottom -= square.top
+				square.top = 0
 				speedY *= -1
 				reverseY = true
 			}
-			if (rc.bottom > (height - 47)) {
-				rc.top -= rc.bottom - (height - 47)
-				rc.bottom = (height - 47)
+			if (square.bottom > (height - 47)) {
+				square.top -= square.bottom - (height - 47)
+				square.bottom = (height - 47)
 				speedY *= -1
 				reverseY = true
 			}
 		}
 
-		if (reverse && iter == 5) {
+		if (reverse && count == 5) {
 			if (reverseX) {
 				speedX *= -1
 				reverseX = false
-				iter = 0
+				count = 0
 			}
 			if (reverseY) {
 				speedY *= -1
 				reverseY = false
-				iter = 0
+				count = 0
 			}
 		}
 	}
-	return DefWindowProcW(hWnd, uMsg, wParam, lParam)
+	return DefWindowProcW(window, msg, wParam, lParam)
 }
 
 enum class HotKeys {

@@ -20,41 +20,47 @@ fun main(args: Array<String>) {
 		val devices = waveInGetNumDevs()
 		println("Доступно следующее количество микрофонов: $devices.")
 
-		val hwi = alloc<HWAVEINVar>()
-		val wfx = alloc<WAVEFORMATEX>()
-		wfx.wFormatTag = WAVE_FORMAT_PCM.toUShort()
-		wfx.nChannels = 2u
-		wfx.nSamplesPerSec = 44100u
-		wfx.nAvgBytesPerSec = (44100 * 2 * 16 / 8).toUInt()
-		wfx.nBlockAlign = (2 * 16 / 8).toUShort()
-		wfx.wBitsPerSample = 16u
-		wfx.cbSize = 0u
+		val waveIn = alloc<HWAVEINVar>()
+		val waveFormat = alloc<WAVEFORMATEX>()
+		waveFormat.wFormatTag = WAVE_FORMAT_PCM.toUShort()
+		waveFormat.nChannels = 2u
+		waveFormat.nSamplesPerSec = 44100u
+		waveFormat.nAvgBytesPerSec = (44100 * 2 * 16 / 8).toUInt()
+		waveFormat.nBlockAlign = (2 * 16 / 8).toUShort()
+		waveFormat.wBitsPerSample = 16u
+		waveFormat.cbSize = 0u
 
-		"waveInOpen" to waveInOpen(hwi.ptr, WAVE_MAPPER, wfx.ptr, 0u, 0u, CALLBACK_NULL.toUInt())
+		"waveInOpen" to waveInOpen(waveIn.ptr, WAVE_MAPPER, waveFormat.ptr, 0u, 0u, CALLBACK_NULL.toUInt())
 
-		val wh = alloc<WAVEHDR>()
-		val bufferSize = 10000000
-		val buffer = allocArray<ShortVar>(bufferSize)
+		val waveBuffer = alloc<WAVEHDR>()
+		val dataSize = 10000000
+		val data = allocArray<ShortVar>(dataSize)
 
-		wh.lpData = buffer.reinterpret()
-		wh.dwBufferLength = bufferSize.toUInt()
+		waveBuffer.lpData = data.reinterpret()
+		waveBuffer.dwBufferLength = dataSize.toUInt()
 
-		"waveInPrepareHeader" to waveInPrepareHeader(hwi.value, wh.ptr, sizeOf<WAVEHDR>().toUInt())
-		"waveInAddBuffer" to waveInAddBuffer(hwi.value, wh.ptr, sizeOf<WAVEHDR>().toUInt())
-		"waveInStart" to waveInStart(hwi.value)
+		"waveInPrepareHeader" to waveInPrepareHeader(waveIn.value, waveBuffer.ptr, sizeOf<WAVEHDR>().toUInt())
+		"waveInAddBuffer" to waveInAddBuffer(waveIn.value, waveBuffer.ptr, sizeOf<WAVEHDR>().toUInt())
+		"waveInStart" to waveInStart(waveIn.value)
 
 		println("Запись начата!")
 
 		Sleep(seconds)
 
-		"waveInStop" to waveInStop(hwi.value)
-		"waveInClose" to waveInClose(hwi.value)
+		"waveInStop" to waveInStop(waveIn.value)
+		"waveInClose" to waveInClose(waveIn.value)
 
 		val outputFile = fopen(path, "wb")
 
 		outputFile?.let {
-			writeWavHeader(it, wfx.nChannels, wfx.nSamplesPerSec, wfx.wBitsPerSample, wh.dwBytesRecorded)
-			fwrite(buffer, 1u, wh.dwBytesRecorded.toULong(), it)
+			writeWavHeader(
+				it,
+				waveFormat.nChannels,
+				waveFormat.nSamplesPerSec,
+				waveFormat.wBitsPerSample,
+				waveBuffer.dwBytesRecorded
+			)
+			fwrite(data, 1u, waveBuffer.dwBytesRecorded.toULong(), it)
 			fclose(it)
 		} ?: run {
 			throw RuntimeException("Ошибка: файл недоступен!")
@@ -62,7 +68,7 @@ fun main(args: Array<String>) {
 
 		log.forEach { (key, value) -> println("$key: $value") }
 
-		println("Записано: ${wh.dwBytesRecorded / 1000u} килобайт")
+		println("Записано: ${waveBuffer.dwBytesRecorded / 1000u} килобайт")
 
 		if (log.entries.any { it.value != "OK" }) {
 			exitProcess(1)
