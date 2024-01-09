@@ -2,9 +2,10 @@ package hummel
 
 import kotlinx.cinterop.*
 import platform.windows.*
+import kotlin.math.max
 
-const val width: Int = 250
-const val height: Int = 160
+const val width: Int = 800
+const val height: Int = 360
 
 fun main() {
 	memScoped {
@@ -24,15 +25,24 @@ fun main() {
 
 		RegisterClassW(windowClass.ptr)
 
+		val screenWidth = GetSystemMetrics(SM_CXSCREEN)
+		val screenHeight = GetSystemMetrics(SM_CYSCREEN)
+
+		val windowWidth = width
+		val windowHeight = height
+
+		val windowX = max(0, (screenWidth - windowWidth) / 2)
+		val windowY = max(0, (screenHeight - windowHeight) / 2)
+
 		val window = CreateWindowExW(
 			WS_EX_CLIENTEDGE.toUInt(),
 			className,
 			windowTitle,
 			(WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX).toUInt(),
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			width,
-			height,
+			windowX,
+			windowY,
+			windowWidth,
+			windowHeight,
 			null,
 			null,
 			null,
@@ -57,29 +67,38 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 
 		when (msg.toInt()) {
 			WM_CREATE -> {
+				val clientRect = alloc<RECT>()
+				GetClientRect(window, clientRect.ptr)
+
+				val buttonWidth = 100
+				val buttonHeight = 100
+				val buttonX = (clientRect.right - buttonWidth) / 2
+				val buttonY = (clientRect.bottom - buttonHeight) / 2
+
 				CreateWindowExW(
 					WS_EX_CLIENTEDGE.toUInt(),
 					"BUTTON",
 					"BUTTON 1",
 					(WS_TABSTOP or WS_VISIBLE or WS_CHILD or BS_DEFPUSHBUTTON).toUInt(),
-					10,
-					10,
-					100,
-					100,
+					buttonX - buttonWidth / 2,
+					buttonY,
+					buttonWidth,
+					buttonHeight,
 					window,
 					null,
 					data.reinterpret(),
 					null
 				)
+
 				CreateWindowExW(
 					WS_EX_CLIENTEDGE.toUInt(),
 					"BUTTON",
 					"BUTTON 2",
 					(WS_TABSTOP or WS_VISIBLE or WS_CHILD or BS_DEFPUSHBUTTON).toUInt(),
-					120,
-					10,
-					100,
-					100,
+					buttonX + buttonWidth + 10 - buttonWidth / 2,
+					buttonY,
+					buttonWidth,
+					buttonHeight,
 					window,
 					null,
 					data.reinterpret(),
