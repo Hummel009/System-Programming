@@ -37,8 +37,7 @@ fun main() {
 		rc.right = 30
 		rc.bottom = 30
 
-		val wc = alloc<WNDCLASSEX>()
-		wc.cbSize = sizeOf<WNDCLASSEX>().toUInt()
+		val wc = alloc<WNDCLASS>()
 		wc.hCursor = LoadCursorW(null, IDC_ARROW)
 		wc.lpfnWndProc = staticCFunction(::wndProc)
 		wc.cbClsExtra = 0
@@ -46,11 +45,10 @@ fun main() {
 		wc.hInstance = null
 		wc.hIcon = null
 		wc.lpszMenuName = null
-		wc.hIconSm = null
 		wc.lpszClassName = className.wcstr.ptr
 		wc.style = 0u
 
-		RegisterClassExW(wc.ptr)
+		RegisterClassW(wc.ptr)
 
 		val hWnd = CreateWindowExW(
 			WS_EX_CLIENTEDGE.toUInt(),
@@ -71,7 +69,7 @@ fun main() {
 		UpdateWindow(hWnd)
 
 		for (key in HotKeys.entries) {
-			RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL.toUInt(), (key.name[0]).code.toUInt())
+			RegisterHotKey(hWnd, key.ordinal, MOD_CONTROL.toUInt(), key.name[0].code.toUInt())
 		}
 
 		val msg = alloc<MSG>()
@@ -265,7 +263,7 @@ private fun wndProc(hWnd: HWND?, uMsg: UINT, wParam: WPARAM, lParam: LPARAM): LR
 			}
 		}
 	}
-	return DefWindowProc!!(hWnd, uMsg, wParam, lParam)
+	return DefWindowProcW(hWnd, uMsg, wParam, lParam)
 }
 
 enum class HotKeys {
