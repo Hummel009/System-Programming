@@ -2,14 +2,15 @@ package hummel
 
 import kotlinx.cinterop.*
 import platform.windows.*
+import kotlin.math.max
 
 const val VK_W: Int = 0x57
 const val VK_A: Int = 0x41
 const val VK_S: Int = 0x53
 const val VK_D: Int = 0x44
 
-const val width: Int = 1280
-const val height: Int = 720
+const val width: Int = 960
+const val height: Int = 540
 
 const val rgbRed: COLORREF = 0x000000FFu
 const val rgbWhite: COLORREF = 0x00FFFFFFu
@@ -50,13 +51,22 @@ fun main() {
 
 		RegisterClassW(windowClass.ptr)
 
+		val screenWidth = GetSystemMetrics(SM_CXSCREEN)
+		val screenHeight = GetSystemMetrics(SM_CYSCREEN)
+
+		val windowWidth = width
+		val windowHeight = height
+
+		val windowX = max(0, (screenWidth - windowWidth) / 2)
+		val windowY = max(0, (screenHeight - windowHeight) / 2)
+
 		val window = CreateWindowExW(
 			WS_EX_CLIENTEDGE.toUInt(),
 			className,
 			windowTitle,
 			(WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX).toUInt(),
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
+			windowX,
+			windowY,
 			width,
 			height,
 			null,

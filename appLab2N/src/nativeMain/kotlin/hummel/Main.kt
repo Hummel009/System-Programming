@@ -4,8 +4,8 @@ import kotlinx.cinterop.*
 import platform.windows.*
 import kotlin.math.max
 
-const val width: Int = 800
-const val height: Int = 360
+const val width: Int = 960
+const val height: Int = 540
 
 fun main() {
 	memScoped {
