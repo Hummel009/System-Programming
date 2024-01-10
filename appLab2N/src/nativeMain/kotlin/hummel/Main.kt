@@ -4,8 +4,8 @@ import kotlinx.cinterop.*
 import platform.windows.*
 import kotlin.math.max
 
-const val width: Int = 960
-const val height: Int = 540
+private const val width: Int = 960
+private const val height: Int = 540
 
 fun main() {
 	memScoped {
@@ -13,15 +13,8 @@ fun main() {
 		val windowTitle = "Windows API: Kotlin Native"
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.hCursor = LoadCursorW(null, IDC_ARROW)
 		windowClass.lpfnWndProc = staticCFunction(::wndProc)
-		windowClass.cbClsExtra = 0
-		windowClass.cbWndExtra = 0
-		windowClass.hInstance = null
-		windowClass.hIcon = null
-		windowClass.lpszMenuName = null
 		windowClass.lpszClassName = className.wcstr.ptr
-		windowClass.style = 0u
 
 		RegisterClassW(windowClass.ptr)
 
@@ -38,7 +31,7 @@ fun main() {
 			WS_EX_CLIENTEDGE.toUInt(),
 			className,
 			windowTitle,
-			(WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX).toUInt(),
+			WS_OVERLAPPEDWINDOW.toUInt(),
 			windowX,
 			windowY,
 			windowWidth,
@@ -62,48 +55,62 @@ fun main() {
 
 private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
 	memScoped {
-		val data = allocArray<LONG_PTRVar>(1)
-		data[0] = GetWindowLongPtrW(window, GWLP_HINSTANCE)
-
 		when (msg.toInt()) {
 			WM_CREATE -> {
 				val clientRect = alloc<RECT>()
 				GetClientRect(window, clientRect.ptr)
 
 				val buttonWidth = 100
-				val buttonHeight = 100
+				val buttonHeight = 40
 				val buttonX = (clientRect.right - buttonWidth) / 2
 				val buttonY = (clientRect.bottom - buttonHeight) / 2
+
+				val id1 = 1
+				val id2 = 2
 
 				CreateWindowExW(
 					WS_EX_CLIENTEDGE.toUInt(),
 					"BUTTON",
-					"BUTTON 1",
+					"Table",
 					(WS_TABSTOP or WS_VISIBLE or WS_CHILD or BS_DEFPUSHBUTTON).toUInt(),
 					buttonX - buttonWidth / 2,
 					buttonY,
 					buttonWidth,
 					buttonHeight,
 					window,
+					id1.toLong().toCPointer(),
 					null,
-					data.reinterpret(),
 					null
 				)
 
 				CreateWindowExW(
 					WS_EX_CLIENTEDGE.toUInt(),
 					"BUTTON",
-					"BUTTON 2",
+					"Circle",
 					(WS_TABSTOP or WS_VISIBLE or WS_CHILD or BS_DEFPUSHBUTTON).toUInt(),
 					buttonX + buttonWidth + 10 - buttonWidth / 2,
 					buttonY,
 					buttonWidth,
 					buttonHeight,
 					window,
+					id2.toLong().toCPointer(),
 					null,
-					data.reinterpret(),
 					null
 				)
+			}
+
+			WM_COMMAND -> {
+				val buttonId = wParam.loword().toInt()
+
+				when (buttonId) {
+					1 -> {
+						MessageBoxW(window, "Button 1 clicked!", "Message", MB_OK.toUInt())
+					}
+
+					2 -> circle()
+
+					else -> DefWindowProcW(window, msg, wParam, lParam)
+				}
 			}
 
 			WM_CLOSE -> DestroyWindow(window)
@@ -114,3 +121,5 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 	}
 	return DefWindowProcW(window, msg, wParam, lParam)
 }
+
+private fun ULong.loword(): ULong = this and 0xFFFFu
