@@ -58,9 +58,9 @@ fun main() {
 }
 
 private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
-	memScoped {
-		when (msg.toInt()) {
-			WM_CREATE -> {
+	when (msg.toInt()) {
+		WM_CREATE -> {
+			memScoped {
 				val square = alloc<RECT>()
 				GetClientRect(window, square.ptr)
 
@@ -99,22 +99,20 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 					null
 				)
 			}
-
-			WM_COMMAND -> {
-				val buttonId = wParam.loword().toInt()
-
-				when (buttonId) {
-					buttonId1 -> table()
-					buttonId2 -> circle()
-					else -> DefWindowProcW(window, msg, wParam, lParam)
-				}
-			}
-
-			WM_CLOSE -> DestroyWindow(window)
-			WM_DESTROY -> PostQuitMessage(0)
-
-			else -> {}
 		}
+
+		WM_COMMAND -> {
+			val buttonId = wParam.loword().toInt()
+
+			when (buttonId) {
+				buttonId1 -> table()
+				buttonId2 -> circle()
+				else -> DefWindowProcW(window, msg, wParam, lParam)
+			}
+		}
+
+		WM_CLOSE -> DestroyWindow(window)
+		WM_DESTROY -> PostQuitMessage(0)
 	}
 	return DefWindowProcW(window, msg, wParam, lParam)
 }
