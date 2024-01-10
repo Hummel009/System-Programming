@@ -91,10 +91,10 @@ private fun tableProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM):
 	return DefWindowProcW(window, msg, wParam, lParam)
 }
 
-private fun redrawTable(hdc: HDC?, rc: RECT) {
+private fun redrawTable(deviceContext: HDC?, square: RECT) {
 	memScoped {
-		val cellWidth = rc.right / m
-		val cellHeight = rc.bottom / n
+		val cellWidth = square.right / m
+		val cellHeight = square.bottom / n
 
 		for (row in 0 until n) {
 			for (col in 0 until m) {
@@ -106,7 +106,7 @@ private fun redrawTable(hdc: HDC?, rc: RECT) {
 
 				if (row < tableData.size && col < tableData[row].size) {
 					DrawTextW(
-						hdc, tableData[row][col], -1, cell.ptr, (DT_CENTER or DT_VCENTER).toUInt()
+						deviceContext, tableData[row][col], -1, cell.ptr, (DT_CENTER or DT_VCENTER).toUInt()
 					)
 				}
 			}
