@@ -58,20 +58,18 @@ fun circle() {
 }
 
 private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
-	memScoped {
-		when (msg.toInt()) {
-			WM_PAINT -> {
+	when (msg.toInt()) {
+		WM_PAINT -> {
+			memScoped {
 				val paintStructure = alloc<PAINTSTRUCT>()
 				val deviceContext = BeginPaint(window, paintStructure.ptr)
 				redrawCircle(deviceContext)
 				EndPaint(window, paintStructure.ptr)
 			}
-
-			WM_CLOSE -> DestroyWindow(window)
-			WM_DESTROY -> PostQuitMessage(0)
-
-			else -> DefWindowProcW(window, msg, wParam, lParam)
 		}
+
+		WM_CLOSE -> DestroyWindow(window)
+		WM_DESTROY -> PostQuitMessage(0)
 	}
 	return DefWindowProcW(window, msg, wParam, lParam)
 }
