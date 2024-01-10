@@ -27,8 +27,8 @@ jobs:
         with:
           name: compiled-artifact
           path: |
-            ./appLab1/build/libs/*.jar
-            ./appLab2/build/libs/*.jar
+            ./appLab1/build/bin/mingwX64/releaseExecutable/*.exe
+            ./appLab2/build/bin/mingwX64/releaseExecutable/*.exe
             ./appLab4/build/bin/mingwX64/releaseExecutable/*.exe
             ./appLab5/build/libs/*.jar
             ./appCourse/build/libs/*.jar

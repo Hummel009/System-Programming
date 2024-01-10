@@ -3,7 +3,6 @@ import java.time.format.DateTimeFormatter
 
 plugins {
 	id("org.jetbrains.kotlin.multiplatform")
-	id("idea")
 }
 
 group = "hummel"
