@@ -29,7 +29,7 @@ lateinit var square: RECT
 
 fun main() {
 	memScoped {
-		val className = "RenderingRectangle"
+		val className = "RedSquare"
 		val windowTitle = "Windows API: Kotlin Native"
 
 		square = alloc<RECT>()
