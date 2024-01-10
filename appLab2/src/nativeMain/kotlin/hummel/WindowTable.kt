@@ -22,7 +22,7 @@ fun table() {
 		val windowTitle = "Windows API: Kotlin Native"
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.lpfnWndProc = staticCFunction(::tableProc)
+		windowClass.lpfnWndProc = staticCFunction(::wndProc)
 		windowClass.lpszClassName = className.wcstr.ptr
 		windowClass.style = (CS_HREDRAW or CS_VREDRAW).toUInt()
 		windowClass.hbrBackground = (COLOR_WINDOW + 1).toLong().toCPointer()
@@ -64,7 +64,7 @@ fun table() {
 	}
 }
 
-private fun tableProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
+private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
 	memScoped {
 		when (msg.toInt()) {
 			WM_SIZE -> {

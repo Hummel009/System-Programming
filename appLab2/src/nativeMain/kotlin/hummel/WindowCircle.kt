@@ -16,7 +16,7 @@ fun circle() {
 		val windowTitle = "Windows API: Kotlin Native"
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.lpfnWndProc = staticCFunction(::circleProc)
+		windowClass.lpfnWndProc = staticCFunction(::wndProc)
 		windowClass.lpszClassName = className.wcstr.ptr
 		windowClass.hbrBackground = (COLOR_WINDOW + 1).toLong().toCPointer()
 
@@ -57,7 +57,7 @@ fun circle() {
 	}
 }
 
-private fun circleProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
+private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
 	memScoped {
 		when (msg.toInt()) {
 			WM_PAINT -> {
