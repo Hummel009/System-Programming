@@ -7,6 +7,9 @@ import kotlin.math.max
 private const val width: Int = 960
 private const val height: Int = 540
 
+private const val buttonId1: Int = 1
+private const val buttonId2: Int = 2
+
 fun main() {
 	memScoped {
 		val className = "RenderingLauncher"
@@ -15,6 +18,7 @@ fun main() {
 		val windowClass = alloc<WNDCLASS>()
 		windowClass.lpfnWndProc = staticCFunction(::wndProc)
 		windowClass.lpszClassName = className.wcstr.ptr
+		windowClass.hbrBackground = COLOR_WINDOW.toLong().toCPointer()
 
 		RegisterClassW(windowClass.ptr)
 
@@ -57,16 +61,13 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 	memScoped {
 		when (msg.toInt()) {
 			WM_CREATE -> {
-				val clientRect = alloc<RECT>()
-				GetClientRect(window, clientRect.ptr)
+				val square = alloc<RECT>()
+				GetClientRect(window, square.ptr)
 
 				val buttonWidth = 100
 				val buttonHeight = 40
-				val buttonX = (clientRect.right - buttonWidth) / 2
-				val buttonY = (clientRect.bottom - buttonHeight) / 2
-
-				val id1 = 1
-				val id2 = 2
+				val buttonX = (square.right - buttonWidth) / 2
+				val buttonY = (square.bottom - buttonHeight) / 2
 
 				CreateWindowExW(
 					WS_EX_CLIENTEDGE.toUInt(),
@@ -78,7 +79,7 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 					buttonWidth,
 					buttonHeight,
 					window,
-					id1.toLong().toCPointer(),
+					buttonId1.toLong().toCPointer(),
 					null,
 					null
 				)
@@ -93,7 +94,7 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 					buttonWidth,
 					buttonHeight,
 					window,
-					id2.toLong().toCPointer(),
+					buttonId2.toLong().toCPointer(),
 					null,
 					null
 				)
@@ -103,12 +104,8 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 				val buttonId = wParam.loword().toInt()
 
 				when (buttonId) {
-					1 -> {
-						MessageBoxW(window, "Button 1 clicked!", "Message", MB_OK.toUInt())
-					}
-
-					2 -> circle()
-
+					buttonId1 -> table()
+					buttonId2 -> circle()
 					else -> DefWindowProcW(window, msg, wParam, lParam)
 				}
 			}

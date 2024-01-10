@@ -10,23 +10,15 @@ import kotlin.math.sin
 private const val width: Int = 660
 private const val height: Int = 660
 
-const val rgbWhite: COLORREF = 0x00FFFFFFu
-
 fun circle() {
 	memScoped {
 		val className = "RenderingCircle"
 		val windowTitle = "Windows API: Kotlin Native"
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.hCursor = LoadCursorW(null, IDC_ARROW)
 		windowClass.lpfnWndProc = staticCFunction(::circleProc)
-		windowClass.cbClsExtra = 0
-		windowClass.cbWndExtra = 0
-		windowClass.hInstance = null
-		windowClass.hIcon = null
-		windowClass.lpszMenuName = null
 		windowClass.lpszClassName = className.wcstr.ptr
-		windowClass.style = 0u
+		windowClass.hbrBackground = (COLOR_WINDOW + 1).toLong().toCPointer()
 
 		RegisterClassW(windowClass.ptr)
 
@@ -43,7 +35,7 @@ fun circle() {
 			WS_EX_CLIENTEDGE.toUInt(),
 			className,
 			windowTitle,
-			(WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX).toUInt(),
+			WS_OVERLAPPEDWINDOW.toUInt(),
 			windowX,
 			windowY,
 			windowWidth,
@@ -67,22 +59,16 @@ fun circle() {
 
 private fun circleProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
 	memScoped {
-		val ps = alloc<PAINTSTRUCT>()
-
 		when (msg.toInt()) {
-			WM_DESTROY -> {
-				PostQuitMessage(0)
+			WM_PAINT -> {
+				val paintStructure = alloc<PAINTSTRUCT>()
+				val deviceContext = BeginPaint(window, paintStructure.ptr)
+				redrawCircle(deviceContext)
+				EndPaint(window, paintStructure.ptr)
 			}
 
-			WM_SIZE -> {
-				val hdc = BeginPaint(window, ps.ptr)
-				val brush = CreateSolidBrush(rgbWhite)
-				val rc = alloc<RECT>()
-				GetClientRect(window, rc.ptr)
-				FillRect(hdc, rc.ptr, brush)
-				redrawCircle(hdc)
-				EndPaint(window, ps.ptr)
-			}
+			WM_CLOSE -> DestroyWindow(window)
+			WM_DESTROY -> PostQuitMessage(0)
 
 			else -> DefWindowProcW(window, msg, wParam, lParam)
 		}
@@ -90,8 +76,8 @@ private fun circleProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM)
 	return DefWindowProcW(window, msg, wParam, lParam)
 }
 
-private fun redrawCircle(hdc: HDC?) {
-	SaveDC(hdc)
+private fun redrawCircle(deviceContext: HDC?) {
+	SaveDC(deviceContext)
 
 	val cX = 300
 	val cY = 300
@@ -103,15 +89,15 @@ private fun redrawCircle(hdc: HDC?) {
 	val text = "Lorem ipsum dolor sit amet"
 	val textLength = text.length
 
-	Ellipse(hdc, 50, 50, 550, 550)
-	Ellipse(hdc, 100, 100, 500, 500)
-	Ellipse(hdc, 150, 150, 450, 450)
-	Ellipse(hdc, 200, 200, 400, 400)
-	Ellipse(hdc, 250, 250, 350, 350)
-	Ellipse(hdc, 290, 290, 310, 310)
+	Ellipse(deviceContext, 50, 50, 550, 550)
+	Ellipse(deviceContext, 100, 100, 500, 500)
+	Ellipse(deviceContext, 150, 150, 450, 450)
+	Ellipse(deviceContext, 200, 200, 400, 400)
+	Ellipse(deviceContext, 250, 250, 350, 350)
+	Ellipse(deviceContext, 290, 290, 310, 310)
 
 	for (i in 0 until textLength) {
-		val hFont = CreateFontA(
+		val font = CreateFontW(
 			24,
 			0,
 			(-(angle + 90) * 10).toInt(),
@@ -127,31 +113,31 @@ private fun redrawCircle(hdc: HDC?) {
 			DEFAULT_PITCH.toUInt() or FF_SWISS.toUInt(),
 			"Arial"
 		)
-		SelectObject(hdc, hFont)
+		SelectObject(deviceContext, font)
 
 		val temp = angle.toRadian()
 
 		var x = cX + r1 * cos(temp)
 		var y = cY + r1 * sin(temp)
 
-		TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
+		TextOutW(deviceContext, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		x = cX + r2 * cos(temp)
 		y = cY + r2 * sin(temp)
 
-		TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
+		TextOutW(deviceContext, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		x = cX + r3 * cos(temp)
 		y = cY + r3 * sin(temp)
 
-		TextOutA(hdc, x.toInt(), y.toInt(), "${text[i]}", 1)
+		TextOutW(deviceContext, x.toInt(), y.toInt(), "${text[i]}", 1)
 
 		angle += (360 / textLength - if (angle >= 360) 360 else 0) + 0.5
 
-		DeleteObject(hFont)
+		DeleteObject(font)
 	}
 
-	RestoreDC(hdc, -1)
+	RestoreDC(deviceContext, -1)
 }
 
 private fun Double.toRadian(): Double = this * PI / 180

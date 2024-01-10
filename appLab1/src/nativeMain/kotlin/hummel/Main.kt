@@ -39,15 +39,8 @@ fun main() {
 		square.bottom = 30
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.hCursor = LoadCursorW(null, IDC_ARROW)
 		windowClass.lpfnWndProc = staticCFunction(::wndProc)
-		windowClass.cbClsExtra = 0
-		windowClass.cbWndExtra = 0
-		windowClass.hInstance = null
-		windowClass.hIcon = null
-		windowClass.lpszMenuName = null
 		windowClass.lpszClassName = className.wcstr.ptr
-		windowClass.style = 0u
 
 		RegisterClassW(windowClass.ptr)
 
@@ -94,14 +87,18 @@ fun main() {
 	}
 }
 
-private fun clearAndUpdate(window: HWND?, square: RECT, snakeMode: Boolean) {
-	if (!snakeMode) {
+private fun clearAndUpdate(window: HWND?, snakeMode: Boolean) {
+	memScoped {
 		val deviceContext = GetDC(window)
+		val square = alloc<RECT>()
 		val brush = CreateSolidBrush(rgbWhite)
-		FillRect(deviceContext, square.ptr, brush)
+		GetClientRect(window, square.ptr)
+		if (!snakeMode) {
+			FillRect(deviceContext, square.ptr, brush)
+		}
+		InvalidateRect(window, null, TRUE)
 		ReleaseDC(window, deviceContext)
 	}
-	InvalidateRect(window, null, 1)
 }
 
 private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
@@ -113,7 +110,7 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 
 		when (msg.toInt()) {
 			WM_KEYDOWN -> {
-				clearAndUpdate(window, square, snakeMode)
+				clearAndUpdate(window, snakeMode)
 				when (wParam.toInt()) {
 					VK_LEFT, VK_A -> {
 						square.left -= speedX
@@ -169,12 +166,16 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 				mouseY = (lParam.toInt() shr 16) and 0xFFFF
 			}
 
-			WM_LBUTTONDOWN, WM_LBUTTONUP -> {
+			WM_LBUTTONDOWN -> {
 				mousePressed = true
 			}
 
+			WM_LBUTTONUP -> {
+				mousePressed = false
+			}
+
 			WM_MOUSEWHEEL -> {
-				clearAndUpdate(window, square, snakeMode)
+				clearAndUpdate(window, snakeMode)
 				val wheelDelta = (wParam.toInt() shr 16)
 				val isShiftPressed = (GetKeyState(VK_SHIFT).toInt() and 0x8000) != 0
 				if (isShiftPressed) {
@@ -197,9 +198,6 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 				movedViaKeyboard = true
 			}
 
-			WM_CLOSE -> DestroyWindow(window)
-			WM_DESTROY -> PostQuitMessage(0)
-
 			WM_PAINT -> {
 				val deviceContext = BeginPaint(window, paintStructure.ptr)
 				val brush = CreateSolidBrush(rgbRed)
@@ -207,26 +205,30 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 				FillRect(deviceContext, square.ptr, brush)
 				EndPaint(window, paintStructure.ptr)
 			}
+
+			WM_CLOSE -> DestroyWindow(window)
+			WM_DESTROY -> PostQuitMessage(0)
 		}
 
 		if (mousePressed) {
-			clearAndUpdate(window, square, snakeMode)
+			clearAndUpdate(window, snakeMode)
 			if (mouseX > square.left) {
-				square.left += speedX
-				square.right += speedX
+				square.left += speedX * 2
+				square.right += speedX * 2
 			}
 			if (mouseX < square.left) {
-				square.left -= speedX
-				square.right -= speedX
+				square.left -= speedX * 2
+				square.right -= speedX * 2
 			}
 			if (mouseY > square.bottom) {
-				square.bottom += speedY
-				square.top += speedY
+				square.bottom += speedY * 2
+				square.top += speedY * 2
 			}
 			if (mouseY < square.bottom) {
-				square.bottom -= speedY
-				square.top -= speedY
+				square.bottom -= speedY * 2
+				square.top -= speedY * 2
 			}
+			mousePressed = false
 		}
 
 		if (movedViaKeyboard) {
