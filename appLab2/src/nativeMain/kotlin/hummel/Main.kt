@@ -107,7 +107,6 @@ private fun wndProc(window: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): L
 			when (buttonId) {
 				buttonId1 -> table()
 				buttonId2 -> circle()
-				else -> DefWindowProcW(window, msg, wParam, lParam)
 			}
 		}
 
