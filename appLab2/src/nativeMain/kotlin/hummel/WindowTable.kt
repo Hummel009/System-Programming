@@ -22,10 +22,16 @@ fun table() {
 		val windowTitle = "Windows API: Kotlin Native"
 
 		val windowClass = alloc<WNDCLASS>()
-		windowClass.lpfnWndProc = staticCFunction(::wndProc)
-		windowClass.lpszClassName = className.wcstr.ptr
 		windowClass.style = (CS_HREDRAW or CS_VREDRAW).toUInt()
+		windowClass.lpfnWndProc = staticCFunction(::wndProc)
+		windowClass.cbClsExtra = 0
+		windowClass.cbWndExtra = 0
+		windowClass.hInstance = null
+		windowClass.hIcon = null
+		windowClass.hCursor = null
 		windowClass.hbrBackground = (COLOR_WINDOW + 1).toLong().toCPointer()
+		windowClass.lpszMenuName = null
+		windowClass.lpszClassName = className.wcstr.ptr
 
 		RegisterClassW(windowClass.ptr)
 
@@ -38,11 +44,11 @@ fun table() {
 		val windowX = max(0, (screenWidth - windowWidth) / 2)
 		val windowY = max(0, (screenHeight - windowHeight) / 2)
 
-		val window = CreateWindowExW(
-			WS_EX_CLIENTEDGE.toUInt(),
+		CreateWindowExW(
+			0u,
 			className,
 			windowTitle,
-			WS_OVERLAPPEDWINDOW.toUInt(),
+			(WS_VISIBLE or WS_CAPTION or WS_SYSMENU or WS_SIZEBOX).toUInt(),
 			windowX,
 			windowY,
 			windowWidth,
@@ -52,9 +58,6 @@ fun table() {
 			null,
 			null
 		)
-
-		ShowWindow(window, SW_SHOW)
-		UpdateWindow(window)
 
 		val msg = alloc<MSG>()
 		while (GetMessageW(msg.ptr, null, 0u, 0u) != 0) {

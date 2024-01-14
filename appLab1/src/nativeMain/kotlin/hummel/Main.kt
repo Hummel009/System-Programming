@@ -39,7 +39,15 @@ fun main() {
 		square.bottom = 30
 
 		val windowClass = alloc<WNDCLASS>()
+		windowClass.style = 0u
 		windowClass.lpfnWndProc = staticCFunction(::wndProc)
+		windowClass.cbClsExtra = 0
+		windowClass.cbWndExtra = 0
+		windowClass.hInstance = null
+		windowClass.hIcon = null
+		windowClass.hCursor = null
+		windowClass.hbrBackground = (COLOR_WINDOW + 1).toLong().toCPointer()
+		windowClass.lpszMenuName = null
 		windowClass.lpszClassName = className.wcstr.ptr
 
 		RegisterClassW(windowClass.ptr)
@@ -54,10 +62,10 @@ fun main() {
 		val windowY = max(0, (screenHeight - windowHeight) / 2)
 
 		val window = CreateWindowExW(
-			WS_EX_CLIENTEDGE.toUInt(),
+			0u,
 			className,
 			windowTitle,
-			(WS_OVERLAPPED or WS_CAPTION or WS_SYSMENU or WS_MINIMIZEBOX).toUInt(),
+			(WS_VISIBLE or WS_CAPTION or WS_SYSMENU).toUInt(),
 			windowX,
 			windowY,
 			width,
@@ -67,9 +75,6 @@ fun main() {
 			null,
 			null
 		)
-
-		ShowWindow(window, SW_SHOW)
-		UpdateWindow(window)
 
 		for (key in HotKeys.entries) {
 			RegisterHotKey(window, key.ordinal, MOD_CONTROL.toUInt(), key.name[0].code.toUInt())
