@@ -12,7 +12,7 @@ version = "v" + LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 val embed: Configuration by configurations.creating
 
 dependencies {
-	embed("org.jetbrains.kotlin:kotlin-stdlib:1.9.21")
+	embed("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
 }
 
 java {
