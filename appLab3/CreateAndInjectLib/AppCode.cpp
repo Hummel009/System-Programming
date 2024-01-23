@@ -44,7 +44,7 @@ int main()
     HANDLE hRemoteProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 
     // Получаем адрес функции LoadLibraryA из kernel32.dll
-    LPVOID threadFunction = (LPVOID)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
+    auto threadFunction = (LPVOID)GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
     string argument = "Lib.dll";
 
     // Выделяем память в удаленном процессе для аргумента строки

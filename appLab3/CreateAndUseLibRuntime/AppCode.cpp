@@ -13,9 +13,9 @@ int main()
 
     if (hDLL != nullptr)
     {
-        AddFunction addFunction = (AddFunction)GetProcAddress(hDLL, "addFunction");
-        SubFunction subFunction = (SubFunction)GetProcAddress(hDLL, "subFunction");
-        PrintFunction printFunction = (PrintFunction)GetProcAddress(hDLL, "printFunction");
+        auto addFunction = (AddFunction)GetProcAddress(hDLL, "addFunction");
+        auto subFunction = (SubFunction)GetProcAddress(hDLL, "subFunction");
+        auto printFunction = (PrintFunction)GetProcAddress(hDLL, "printFunction");
 
         if (addFunction && subFunction && printFunction)
         {

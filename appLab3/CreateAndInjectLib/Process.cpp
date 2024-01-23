@@ -9,7 +9,7 @@ int main()
 {
 	string str = "Hummel010";
 
-	while (1)
+	while (TRUE)
 	{
 		cout << str << endl;
 		Sleep(500);

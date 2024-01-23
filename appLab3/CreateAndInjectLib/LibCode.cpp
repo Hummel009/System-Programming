@@ -18,7 +18,7 @@ void replaceFunction(string data, string replacement)
     MEMORY_BASIC_INFORMATION info;
 
     // Указатель на текущий адрес в памяти
-    char *p = 0;
+    char *p = nullptr;
 
     // Проходим по всей памяти процесса
     while (p < si.lpMaximumApplicationAddress)
