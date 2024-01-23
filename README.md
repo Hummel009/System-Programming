@@ -1,3 +1,14 @@
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=code_smells)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=bugs)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=duplicated_lines_density)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Hummel009_UN-ION-Discord-Bot&metric=ncloc)](https://sonarcloud.io/summary/overall?id=Hummel009_UN-ION-Discord-Bot)
+
 Мои лабораторные работы для BSUIR/БГУИР (белорусский государственный университет информатики и радиоэлектроники).
 
 Предмет - SP/СП (системное программирование).
@@ -9,9 +20,9 @@
 | Технология                                    | Версия    |
 |-----------------------------------------------|-----------|
 | Версия системы автоматической сборки Gradle   | 8.5       |
-| Версия Java, используемая для запуска Gradle  | 21.0.1    |
-| Версия Java, используемая для запуска проекта | 21.0.1    |
-| Версия Java, используемая для сборки проекта  | 21.0.1    |
+| Версия Java, используемая для запуска Gradle  | 21.0.2    |
+| Версия Java, используемая для запуска проекта | 21.0.2    |
+| Версия Java, используемая для сборки проекта  | 21.0.2    |
 | Версия Kotlin                                 | 1.9.22    |
 
 *Важно: appLab3 - это набор папок, не предназначенных для запуска из сред программирования. Каждая подпапка содержит в себе решение одного пункта задания на языке С++. Программы запускаются bat-файлами при условии, что на компьютере установлен и сконфигурирован компилятор GCC.*
