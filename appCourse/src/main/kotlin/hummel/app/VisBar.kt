@@ -31,7 +31,7 @@ class VisBar : Group(), Updatable {
 		canvas.width = 2560.0
 		canvas.height = 1440.0
 		canvas.isCache = true
-		gc = canvas.getGraphicsContext2D()
+		gc = canvas.graphicsContext2D
 		bloom = Bloom()
 		canvas.effect = bloom
 		reflection = Reflection()

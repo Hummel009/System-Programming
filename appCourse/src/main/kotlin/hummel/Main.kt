@@ -33,6 +33,16 @@ fun main() {
 	}
 }
 
+private const val ERR: String = "Ошибка"
+private const val REC_ERR: String = "Микрофон недоступен!"
+private const val FFT_ERR: String = "Преобразование недоступно!"
+
+private const val FILE_ERR: String = "Файл недоступен!"
+
+private const val SUCC: String = "Успех"
+private const val REC_SUCC: String = "Запись завершена!"
+private const val FFT_SUCC = "Преобразование завершено!"
+
 class GUI : JFrame() {
 	var frame: GUI = this
 
@@ -103,16 +113,16 @@ class GUI : JFrame() {
 					val result = process.waitFor()
 					if (result == 0) {
 						JOptionPane.showMessageDialog(
-							this, "Запись завершена!", "Успех", JOptionPane.INFORMATION_MESSAGE
+							this, REC_SUCC, SUCC, JOptionPane.INFORMATION_MESSAGE
 						)
 					} else {
 						JOptionPane.showMessageDialog(
-							this, "Микрофон недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+							this, REC_ERR, ERR, JOptionPane.ERROR_MESSAGE
 						)
 					}
 				} else {
 					JOptionPane.showMessageDialog(
-						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+						this, FILE_ERR, ERR, JOptionPane.ERROR_MESSAGE
 					)
 				}
 			}
@@ -129,7 +139,7 @@ class GUI : JFrame() {
 					Platform.runLater {
 						val stage = Stage()
 						stage.title = "Hummel009's Media Player"
-						stage.setScene(app.scene)
+						stage.scene = app.scene
 						stage.show()
 						stage.setOnCloseRequest {
 							it.consume()
@@ -139,7 +149,7 @@ class GUI : JFrame() {
 					}
 				} else {
 					JOptionPane.showMessageDialog(
-						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+						this, FILE_ERR, ERR, JOptionPane.ERROR_MESSAGE
 					)
 				}
 			}
@@ -156,16 +166,16 @@ class GUI : JFrame() {
 						val fft = FourierTransform(wavFile)
 						fft.execute()
 						JOptionPane.showMessageDialog(
-							this, "Преобразование завершено!", "Успех", JOptionPane.INFORMATION_MESSAGE
+							this, FFT_SUCC, SUCC, JOptionPane.INFORMATION_MESSAGE
 						)
 					} catch (e: Exception) {
 						JOptionPane.showMessageDialog(
-							this, "Преобразование недоступно!", "Ошибка", JOptionPane.ERROR_MESSAGE
+							this, FFT_ERR, ERR, JOptionPane.ERROR_MESSAGE
 						)
 					}
 				} else {
 					JOptionPane.showMessageDialog(
-						this, "Файл недоступен!", "Ошибка", JOptionPane.ERROR_MESSAGE
+						this, FILE_ERR, ERR, JOptionPane.ERROR_MESSAGE
 					)
 				}
 			}

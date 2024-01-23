@@ -11,7 +11,7 @@ int main()
 {
     HINSTANCE hDLL = LoadLibrary("Lib.dll");
 
-    if (hDLL != NULL)
+    if (hDLL != nullptr)
     {
         AddFunction addFunction = (AddFunction)GetProcAddress(hDLL, "addFunction");
         SubFunction subFunction = (SubFunction)GetProcAddress(hDLL, "subFunction");

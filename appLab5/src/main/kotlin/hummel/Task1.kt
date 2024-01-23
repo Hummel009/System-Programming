@@ -10,7 +10,7 @@ fun launchTask1() {
 	repeat(10) { threads.add(thread { queue.add { println("task from thread $it") } }) }
 	threads.forEach { it.join() }
 
-	while (!queue.isEmpty()) {
+	while (queue.isNotEmpty()) {
 		print("Executing ")
 		queue.poll().invoke()
 	}

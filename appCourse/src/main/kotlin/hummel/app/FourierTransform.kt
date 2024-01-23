@@ -6,6 +6,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.*
 
+private const val FORMAT_ERR: String = "Ошибка: неверный формат файла WAV!"
+
 class FourierTransform(private var wavFile: File) {
 	fun execute() {
 		val samples = getSamplesFromFile()
@@ -51,29 +53,29 @@ class FourierTransform(private var wavFile: File) {
 
 		val chunkId = String(wavData, 0, 4)
 		if (chunkId != "RIFF") {
-			throw Exception("Ошибка: неверный формат файла WAV!")
+			throw Exception(FORMAT_ERR)
 		}
 
 		val format = String(wavData, 8, 4)
 		if (format != "WAVE") {
-			throw Exception("Ошибка: неверный формат файла WAV!")
+			throw Exception(FORMAT_ERR)
 		}
 
 		val subchunk1Id = String(wavData, 12, 4)
 		if (subchunk1Id != "fmt ") {
-			throw Exception("Ошибка: неверный формат файла WAV!")
+			throw Exception(FORMAT_ERR)
 		}
 
 		val audioFormat = byteArrayToShort(wavData, 20)
 		if (audioFormat != 1.toShort()) {
-			throw Exception("Ошибка: неверный формат файла WAV!")
+			throw Exception(FORMAT_ERR)
 		}
 
 		val bitsPerSample = byteArrayToShort(wavData, 34).toInt()
 
 		val subchunk2Id = String(wavData, 36, 4)
 		if (subchunk2Id != "data") {
-			throw Exception("Ошибка: неверный формат файла WAV!")
+			throw Exception(FORMAT_ERR)
 		}
 
 		// Чтение семплов звука
@@ -91,7 +93,7 @@ class FourierTransform(private var wavFile: File) {
 				8 -> sampleBytes[0].toDouble()
 				16 -> byteArrayToShort(sampleBytes, 0).toDouble()
 				32 -> byteArrayToInt(sampleBytes, 0).toDouble()
-				else -> throw Exception("Ошибка: неверный формат файла WAV!")
+				else -> throw Exception(FORMAT_ERR)
 			}
 
 			samples[sampleIndex] = sampleValue

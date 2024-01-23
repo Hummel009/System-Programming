@@ -48,12 +48,12 @@ int main()
     string argument = "Lib.dll";
 
     // Выделяем память в удаленном процессе для аргумента строки
-    LPVOID argumentAddress = VirtualAllocEx(hRemoteProcess, NULL, argument.length() + 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    LPVOID argumentAddress = VirtualAllocEx(hRemoteProcess, nullptr, argument.length() + 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     // Записываем аргумент в память удаленного процесса
-    WriteProcessMemory(hRemoteProcess, argumentAddress, argument.c_str(), argument.length() + 1, NULL);
+    WriteProcessMemory(hRemoteProcess, argumentAddress, argument.c_str(), argument.length() + 1, nullptr);
 
     // Создаем удаленный поток, вызывающий LoadLibraryA с аргументом
-    if (CreateRemoteThread(hRemoteProcess, NULL, 0, (LPTHREAD_START_ROUTINE)threadFunction, argumentAddress, 0, NULL))
+    if (CreateRemoteThread(hRemoteProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)threadFunction, argumentAddress, 0, nullptr))
     {
         // Ждем некоторое время, чтобы поток имел шанс выполниться
         Sleep(1000);
