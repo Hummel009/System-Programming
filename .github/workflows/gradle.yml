@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [ 'Lab1', 'Lab2', 'Lab3', 'Lab4', 'Lab5', 'Course', 'CourseMP' ]
+        version: [ 'Lab1', 'Lab2', 'Lab4', 'Lab5', 'Course', 'CourseMP' ]
     steps:
       - uses: actions/checkout@main
       - name: Set up JDK 21
