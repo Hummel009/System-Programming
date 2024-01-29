@@ -11,6 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        version: [ 'Lab1', 'Lab2', 'Lab3', 'Lab4', 'Lab5', 'Course', 'CourseMP' ]
     steps:
       - uses: actions/checkout@main
       - name: Set up JDK 21
@@ -21,15 +24,9 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@main
         with:
-          arguments: build
+          arguments: :app${{matrix.version}}:build
       - name: Upload Artifact
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: compiled-artifact
-          path: |
-            ./appLab1/build/bin/mingwX64/releaseExecutable/*.exe
-            ./appLab2/build/bin/mingwX64/releaseExecutable/*.exe
-            ./appLab4/build/bin/mingwX64/releaseExecutable/*.exe
-            ./appLab5/build/libs/*.jar
-            ./appCourse/build/libs/*.jar
-            ./appCourseMP/build/bin/mingwX64/releaseExecutable/*.exe
+          path: ./app${{matrix.version}}/build/libs/*.jar
