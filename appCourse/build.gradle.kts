@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.example"
-version = "v" + LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
+version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 dependencies {
 	implementation("com.formdev:flatlaf:3.2.5")
