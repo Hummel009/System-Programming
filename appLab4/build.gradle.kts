@@ -18,7 +18,7 @@ kotlin {
 	mingwX64 {
 		binaries {
 			executable {
-				entryPoint("com.github.hummel.lab4.main")
+				entryPoint("com.github.hummel.sp.lab4.main")
 				linkerOpts("-lwinmm")
 				baseName = "${project.name}-${project.version}"
 			}
