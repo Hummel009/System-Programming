@@ -6,7 +6,7 @@ plugins {
 	id("idea")
 }
 
-group = "hummel"
+group = "com.github.hummel"
 version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 java {
@@ -19,7 +19,7 @@ kotlin {
 	mingwX64 {
 		binaries {
 			executable {
-				entryPoint("hummel.main")
+				entryPoint("com.github.hummel.coursemp.main")
 				linkerOpts("-lwinmm")
 				baseName = "${project.name}-${project.version}"
 			}

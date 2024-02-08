@@ -7,7 +7,7 @@ plugins {
 	id("application")
 }
 
-group = "org.example"
+group = "com.github.hummel"
 version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 dependencies {
@@ -23,7 +23,7 @@ java {
 }
 
 application {
-	mainClass = "hummel.MainKt"
+	mainClass = "com.github.hummel.course.MainKt"
 }
 
 javafx {
@@ -39,7 +39,7 @@ tasks {
 		manifest {
 			attributes(
 				mapOf(
-					"Main-Class" to "hummel.MainKt"
+					"Main-Class" to "com.github.hummel.course.MainKt"
 				)
 			)
 		}
