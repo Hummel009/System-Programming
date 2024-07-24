@@ -11,9 +11,9 @@ group = "com.github.hummel"
 version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 dependencies {
-	implementation("com.formdev:flatlaf:3.4.1")
-	implementation("com.formdev:flatlaf-intellij-themes:3.4.1")
-	implementation("com.tambapps.fft4j:fft4j:2.0")
+	implementation("com.formdev:flatlaf:latest.release")
+	implementation("com.formdev:flatlaf-intellij-themes:latest.release")
+	implementation("com.tambapps.fft4j:fft4j:latest.release")
 }
 
 java {
