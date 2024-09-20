@@ -10,34 +10,30 @@ private const val FORMAT_ERR: String = "Ошибка: неверный форм�
 
 class FourierTransform(private var wavFile: File) {
 	fun execute() {
-		val samples = getSamplesFromFile()
+		val signal = getSamplesFromFile().map { it.toFloat() }.toFloatArray()
 
-		val sampleCount = samples.size
+		val originalSize = signal.size
+		val nearestPowerOfTwo = 1 shl (32 - Integer.numberOfLeadingZeros(originalSize - 1))
+		val paddedSignal = FloatArray(nearestPowerOfTwo)
+		signal.copyInto(paddedSignal)
 
-		val fftSize = 2.0.pow(ceil(log2(sampleCount.toDouble()))).toInt()
-		val rex = samples.copyOf(fftSize)
-		val imx = DoubleArray(fftSize)
+		val n = paddedSignal.size
+		val real = FloatArray(n) { paddedSignal[it] }
+		val imag = FloatArray(n) { 0.0f }
 
-		//val fftSize = 8
-		//val rex = doubleArrayOf(-2.1, 1.1, -1.1, 5.1, 0.1, 3.1, 0.1, -4.1)
-		//val imx = DoubleArray(fftSize)
-
-		//FastFouriers.BEST.transform(rex, imx)
-
-		// Выполнение разложения
-		basicFourierTransform(fftSize, rex, imx)
+		fft(real, imag)
 
 		// Вывод результатов
 		val result = buildString {
-			for (i in 0 until fftSize) {
+			for (i in 0 until n) {
 				append("REX[")
 				append(i)
 				append("] = ")
-				append(rex[i])
+				append(real[i])
 				append(", IMX[")
 				append(i)
 				append("] = ")
-				append(imx[i])
+				append(imag[i])
 				append("\r\n")
 			}
 		}
@@ -115,136 +111,69 @@ class FourierTransform(private var wavFile: File) {
 		return buffer.int
 	}
 
-	@Suppress("NAME_SHADOWING")
-	private fun basicFourierTransform(n: Int, rex: DoubleArray, imx: DoubleArray) {
+	private fun fft(x: FloatArray, y: FloatArray) {
+		var j: Int
 		var k: Int
-		var tr: Double
-		var ti: Double
-		var le: Int
-		var le2: Int
-		var ur: Double
-		var ui: Double
-		var sr: Double
-		var si: Double
-		var jm1: Int
-		var ip: Int
+		var n1: Int
+		var n2: Int
+		var a: Int
+		var c: Float
+		var s: Float
+		var t1: Float
+		var t2: Float
+		var n = x.size
+		var m = (ln(n.toFloat()) / ln(2.0)).toInt()
 
-		//Set constants
-		val pi = Math.PI //1050
-		val nm1 = n - 1 //1060
-		val nd2 = n / 2 //1070
-		val m = log2(n.toDouble()).toInt() //1080
-		var j = nd2 //1090
-
-		//Bit reversal sorting
-		class GoTo1190 : Exception()
-		nextI@ for (i in 1 until n - 1) { //1110
-			try {
-				if (i >= j) throw GoTo1190() //1120
-				tr = rex[j] //1130
-				ti = imx[j] //1140
-				rex[j] = rex[i] //1150
-				imx[j] = imx[i] //1160
-				rex[i] = tr //1170
-				imx[i] = ti //1180
-				throw GoTo1190()
-			} catch (e: GoTo1190) {
-				k = nd2 //1190
-				while (k <= j) { //1220
-					j -= k //1210
-					k /= 2 //1220
-				}
-				j += k //1240
-				continue@nextI //1250
+		j = 0
+		n2 = n / 2
+		var i = 1
+		while (i < n - 1) {
+			n1 = n2
+			while (j >= n1) {
+				j = j - n1
+				n1 = n1 / 2
 			}
+			j = j + n1
+
+			if (i < j) {
+				t1 = x[i]
+				x[i] = x[j]
+				x[j] = t1
+				t1 = y[i]
+				y[i] = y[j]
+				y[j] = t1
+			}
+			i++
 		}
 
-		//Loop for each stage
-		for (l in 1..m) { //1270
-			le = (2.0.pow(l)).toInt() //1280
-			le2 = le / 2 //1290
-			ur = 1.0 //1300
-			ui = 0.0 //1310
+		n1 = 0
+		n2 = 1
 
-			//Calculate sine & cosine values
-			sr = cos(pi / le2) //1320
-			si = -sin(pi / le2) //1330
+		i = 0
+		while (i < m) {
+			n1 = n2
+			n2 = n2 + n2
+			a = 0
 
-			//Loop for each sub DFT
-			for (j in 1..le2) { //1340
-				jm1 = j - 1 //1350
+			j = 0
+			while (j < n1) {
+				c = cos(a.toFloat())
+				s = sin(a.toFloat())
+				a += 1 shl m - i - 1
 
-				//Loop for each butterfly
-				for (i in jm1..nm1 step le) { //1360
-					ip = i + le2 //1370
-
-					//Butterfly calculation
-					tr = rex[ip] * ur - imx[ip] * ui //1380
-					ti = rex[ip] * ui + imx[ip] * ur //1390
-					rex[ip] = rex[i] - tr //1400
-					imx[ip] = imx[i] - ti //1410
-					rex[i] = rex[i] + tr //1420
-					imx[i] = imx[i] + ti //1430
+				k = j
+				while (k < n) {
+					t1 = c * x[k + n1] - s * y[k + n1]
+					t2 = s * x[k + n1] + c * y[k + n1]
+					x[k + n1] = x[k] - t1
+					y[k + n1] = y[k] - t2
+					x[k] = x[k] + t1
+					y[k] = y[k] + t2
+					k = k + n2
 				}
-				tr = ur //1450
-				ur = tr * sr - ui * si //1460
-				ui = tr * si + ui * sr //1470
+				++j
 			}
+			++i
 		}
 	}
-
-	/**
-	 * 1000 'THE FAST FOURIER TRANSFORM
-	 * 1010 'Upon entry, N% contains the number of points in the DFT, REX[ ] and
-	 * 1020 'IMX[ ] contain the real and imaginary parts of the input. Upon return,
-	 * 1030 'REX[ ] and IMX[ ] contain the DFT output. All signals run from 0 to N%-1.
-	 * 1040 '
-	 * 1050 PI = 3.14159265 'Set constants
-	 * 1060 NM1% = N%-1
-	 * 1070 ND2% = N%/2
-	 * 1080 M% = CINT(LOG(N%)/LOG(2))
-	 * 1090 J% = ND2%
-	 * 1100 '
-	 * 1110 FOR I% = 1 TO N%-2 'Bit reversal sorting
-	 * 1120 IF I% >= J% THEN GOTO 1190
-	 * 1130 TR = REX[J%]
-	 * 1140 TI = IMX[J%]
-	 * 1150 REX[J%] = REX[I%]
-	 * 1160 IMX[J%] = IMX[I%]
-	 * 1170 REX[I%] = TR
-	 * 1180 IMX[I%] = TI
-	 * 1190 K% = ND2%
-	 * 1200 IF K% > J% THEN GOTO 1240
-	 * 1210 J% = J%-K%
-	 * 1220 K% = K%/2
-	 * 1230 GOTO 1200
-	 * 1240 J% = J%+K%
-	 * 1250 NEXT I%
-	 * 1260 '
-	 * 1270 FOR L% = 1 TO M% 'Loop for each stage
-	 * 1280 LE% = CINT(2^L%)
-	 * 1290 LE2% = LE%/2
-	 * 1300 UR = 1
-	 * 1310 UI = 0
-	 * 1320 SR = COS(PI/LE2%) 'Calculate sine & cosine values
-	 * 1330 SI = -SIN(PI/LE2%)
-	 * 1340 FOR J% = 1 TO LE2% 'Loop for each sub DFT
-	 * 1350 JM1% = J%-1
-	 * 1360 FOR I% = JM1% TO NM1% STEP LE% 'Loop for each butterfly
-	 * 1370 IP% = I%+LE2%
-	 * 1380 TR = REX[IP%]*UR - IMX[IP%]*UI 'Butterfly calculation
-	 * 1390 TI = REX[IP%]*UI + IMX[IP%]*UR
-	 * 1400 REX[IP%] = REX[I%]-TR
-	 * 1410 IMX[IP%] = IMX[I%]-TI
-	 * 1420 REX[I%] = REX[I%]+TR
-	 * 1430 IMX[I%] = IMX[I%]+TI
-	 * 1440 NEXT I%
-	 * 1450 TR = UR
-	 * 1460 UR = TR*SR - UI*SI
-	 * 1470 UI = TR*SI + UI*SR
-	 * 1480 NEXT J%
-	 * 1490 NEXT L%
-	 * 1500 '
-	 * 1510 RETURN
-	 */
 }
